@@ -1,0 +1,22 @@
+name: document
+
+on:
+  push:
+    branches:
+      - main
+    tags: '*'
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+      - name: Instantiate
+        run: julia --project=doc doc/instantiate.jl
+      - name: Build and deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: julia --project=doc doc/build.jl

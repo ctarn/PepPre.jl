@@ -1,0 +1,19 @@
+name = "PepPre"
+uuid = "4993a608-c569-46d7-95b9-1fba1b0e5595"
+authors = ["Tarn Yeong Ching <i@ctarn.io>"]
+version = "1.0.0"
+
+[deps]
+ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+MesCore = "0da6f6f1-6857-4856-ba89-6a679ab95268"
+PepIso = "9e738347-ca36-4573-85ad-8945ce437d8c"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
