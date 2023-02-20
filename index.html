@@ -1,0 +1,126 @@
+<html>
+<head>
+<title>PepPre</title>
+<style>
+* {
+    font-family: Helvetica, Arial, sans-serif;
+    color: grey;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: darkcyan;
+}
+
+div.wrapper {
+    width: 800px;
+    margin: 16px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+header {
+    width: 100%;
+    text-align: center;
+    margin: 16px auto;
+}
+
+main {
+    width: 100%;
+    min-height: 520px;
+    margin: 16px auto;
+}
+
+div.toc {
+    width: 40%;
+    float: right;
+}
+
+footer {
+    width: 100%;
+    margin: 16px auto;
+    display: flex;
+    justify-content: space-around;
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<header><h1>PepPre</h1></header>
+<main>
+<h2>PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors</h2>
+
+<h2>Abstract</h2>
+<div class="toc"><embed src="fig/PepPre_toc.svg" type="image/svg+xml"/></div>
+<p>
+    Accurate and comprehensive peptide precursor ions are crucial to tandem mass spectrometry-based peptide identification.
+    An identification engine can greatly benefit from the search space reduction hinted by credible and detailed precursors.
+    Additionally,
+    both the number of identifications and the spectrum explainability can be increased by considering multiple precursors per spectrum.
+    Here,
+    we propose PepPre, which detects precursors by decomposing peaks into multiple isotope clusters using linear programming methods.
+    The detected precursors are scored and ranked, and the high-scoring ones are used for the following peptide identification.
+    PepPre is evaluated both on regular and cross-linked peptides datasets, and compared with 11 methods in this paper.
+    The experimental results show that PepPre achieves
+    203% more PSM
+    and 68% more peptide identifications
+    than instrument software for regular peptides,
+    and 99% more PSM
+    and 27% more peptide pair identifications
+    for cross-linked peptides,
+    which also outperforms all other evaluated methods.
+    In addition to the increased identification numbers,
+    further credibility evaluation evidence that the identifications are credible.
+    Moreover,
+    by widening the isolation window of data acquisition from 2 Th to 8 Th,
+    the engine is able to identify
+    at least 64% more PSMs with PepPre,
+    demonstrating the potential advantages of large isolation windows.
+</p>
+
+<h2>Usage</h2>
+<ul>
+    <li>Please try <a href="http://pepfeat.ctarn.io">PepFeat</a> if you want to detect peptide features from LC-MS map.</li>
+    <li>PepPre will generate the isotopic pattern vectors (IPV) on the first run, and it may cost minutes.</li>
+</ul>
+
+<h2>Release</h2>
+<ul><li> version 1.0.0:<div><a href="https://github.com/ctarn/PepPre.cs/releases/download/v1.0.0/PepPre-1.0.0.x86_64.Linux.zip">Linux</a>
+|
+<a href="https://github.com/ctarn/PepPre.cs/releases/download/v1.0.0/PepPre-1.0.0.x86_64.Darwin.zip">macOS</a>
+|
+<a href="https://github.com/ctarn/PepPre.cs/releases/download/v1.0.0/PepPre-1.0.0.x86_64.Windows.zip">Windows</a>
+</div></li></ul>
+
+<h2>Q&A</h2>
+<ul>
+    <li>
+        macOS says: “PepPre.app” is damaged and can’t be opened. You should move it to the Trash.
+        <br /><br />
+        Please run `sudo xattr -r -d com.apple.quarantine [path/to/PepPre.app]` in terminal.
+    </li>
+    <br />
+    <li>
+        Windows Security stops the software and deletes the .exe file.
+        <br /><br />
+        The software is packaged using PyInstaller, and can be detected as virus by mistake on Windows (see <a href="https://github.com/pyinstaller/pyinstaller/issues/5932">the issue</a>).
+        Please restore the deleted file from `Protection History`, and Windows Security should not stop or delete it again.
+        Otherwise, please add the software to white list.
+        You can also package the software from source yourself.
+    </li>
+</ul>
+
+<h2>Source</h2>
+<ul>
+    <li><a href="https://github.com/ctarn/MesCore.jl">MesCore.jl</a></li>
+    <li><a href="https://github.com/ctarn/PepIso.jl">PepIso.jl</a></li>
+    <li><a href="https://github.com/ctarn/PepPre.jl">PepPre.jl</a></li>
+</ul>
+</main>
+<footer>
+    <span><a href="http://ctarn.io">http://ctarn.io</a></span>
+    <span>Copyright &copy; Tarn Yeong Ching</span>
+    <span><a href="mailto:i@ctarn.io">i@ctarn.io</a></span></footer>
+</div>
+</body>
+</html>
