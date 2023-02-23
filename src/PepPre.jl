@@ -7,16 +7,6 @@ import MesCore
 import PepIso: PepIso, IPV
 import ProgressMeter: @showprogress
 
-check_ion(ion, spec, ε, V, max_mode=false) = begin
-    f = x -> (x > 0) && !isempty(MesCore.query_ε(spec, IPV.ipv_mz(ion, x, V), ε))
-    if max_mode
-        i = argmax(IPV.ipv_w(ion, V))
-        return f(i) && (f(i + 1) || f(i - 1))
-    else
-        return f(1) && f(2)
-    end
-end
-
 merge_ions(ions, ε) = begin
     ans = empty(ions)
     length(ions) == 0 && return ans
@@ -88,7 +78,7 @@ evaluate(ms1, mz, r, zs, ε, V, τ, max_mode=false) = begin
     ions = map(ms1) do spec
         peaks = MesCore.query(spec, mz - r - 2, mz + r + 1)
         ions = [MesCore.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
-        ions = filter(i -> i.m < length(V) && check_ion(i, spec, ε, V, max_mode), ions)
+        ions = filter(i -> i.m < length(V) && PepIso.prefilter(i, spec, ε, V, max_mode), ions)
         ions = PepIso.deisotope(ions, spec, τ, ε, V, :LP)
         inten = sum(p -> p.inten, MesCore.query(peaks, mz - r, mz + r), init=1.0e-16)
         ions = map(ions) do ion
