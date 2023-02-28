@@ -11,10 +11,10 @@ rm(out; force=true, recursive=true)
 LibGit2.clone("https://$(repo)", out, branch="gh-pages")
 rm(joinpath(out, ".git"); force=true, recursive=true)
 
-vs = readdir(joinpath(root, "log")) .|> VersionNumber
+vs = readdir(joinpath(root, "log")) .|> splitext .|> first .|> VersionNumber
 sort!(vs; rev=true)
 logs = map(vs) do v in
-    "<li> version $(v):<div>$(read(joinpath(root, "log", string(v)), String))</div></li>"
+    "<li> version $(v):<div>$(read(joinpath(root, "log", "$(v).html"), String))</div></li>"
 end
 
 html = read(joinpath(root, "index.html"), String)
