@@ -180,13 +180,18 @@ def do_run():
     do_save()
     for p in vars["data"].get().split(";"):
         ext = os.path.splitext(p)[1].lower()
-        if ext == ".ms1":
+        if ext == ".ms2":
+            pass
+        elif ext == ".ms1":
             print("ERROR: select MS2 files instead of MS1 files.")
             break
         elif ext == ".raw":
             p = run_thermorawread(p, vars["out"].get())
-        else:
+        elif util.is_windows:
             p = run_msconvert(p, vars["out"].get())
+        else:
+            print("WARN: file not supported and skipped, path =", p)
+            continue
         run_peppre(p)
     btn_run.config(state="normal")
 
