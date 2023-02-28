@@ -8,7 +8,7 @@ from tkinter import ttk, filedialog, scrolledtext
 import util
 
 name = "PepPre"
-version = "1.0.0"
+version = "1.0.1"
 author = "Tarn Yeong Ching"
 url = f"http://{name.lower()}.ctarn.io"
 server = f"http://api.ctarn.io/{name}/{version}"
