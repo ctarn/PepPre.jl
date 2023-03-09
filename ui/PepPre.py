@@ -12,7 +12,7 @@ path_autosave = os.path.join(meta.homedir, "autosave.task")
 
 win = tk.Tk()
 win.title(meta.name)
-win.iconphoto(True, tk.PhotoImage(file=util.get_content(F"{meta.name}.png", shared=True)))
+win.iconphoto(True, tk.PhotoImage(file=util.get_content(f"{meta.name}.png", shared=True)))
 win.resizable(False, False)
 main = ttk.Frame(win)
 main.grid(column=0, row=0, padx=16, pady=8)
