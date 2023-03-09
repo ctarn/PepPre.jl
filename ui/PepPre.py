@@ -20,6 +20,7 @@ path_autosave = os.path.join(dir_cfg, "autosave.task")
 
 win = tk.Tk()
 win.title(name)
+win.iconphoto(True, tk.PhotoImage(file=util.get_content(F"{name}.png", shared=True)))
 win.resizable(False, False)
 main = ttk.Frame(win)
 main.grid(column=0, row=0, padx=16, pady=8)
