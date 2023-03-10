@@ -14,11 +14,11 @@ rm(joinpath(out, ".git"); force=true, recursive=true)
 vs = readdir(joinpath(root, "log")) .|> splitext .|> first .|> VersionNumber
 sort!(vs; rev=true)
 logs = map(vs) do v in
-    "<li> version $(v):<div>$(read(joinpath(root, "log", "$(v).html"), String))</div></li>"
+    "<section>$(read(joinpath(root, "log", "$(v).html"), String))</section>"
 end
 
 html = read(joinpath(root, "index.html"), String)
-html = replace(html, "{{ release }}" => "<ul>$(join(logs))</ul>")
+html = replace(html, "{{ release }}" => "<div class=\"release\">$(join(logs))</div>")
 open(io -> write(io, html), joinpath(out, "index.html"); write=true)
 
 open(io -> write(io, "peppre.ctarn.io"), joinpath(out, "CNAME"); write=true)
