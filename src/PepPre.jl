@@ -238,11 +238,9 @@ main() = begin
             required = true
     end
     args = ArgParse.parse_args(settings)
-    for path in args["data"]
-        for file in readdir(dirname(path))
-            if startswith(file, basename(path)) && endswith(file, ".ms2")
-                detect_precursor(joinpath(dirname(path), file), args)
-            end
+    for path in args["data"], file in readdir(dirname(path))
+        if file == basename(path) || (startswith(file, basename(path)) && endswith(file, ".ms2"))
+            detect_precursor(joinpath(dirname(path), file), args)
         end
     end
 end
