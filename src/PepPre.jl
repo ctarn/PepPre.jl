@@ -3,8 +3,8 @@ module PepPre
 using Base: Filesystem
 
 import ArgParse
-import MesCore
-import PepIso: PepIso, IPV
+import MesMS
+import MesMS: PepIso
 import ProgressMeter: @showprogress
 
 merge_ions(ions, ε) = begin
@@ -14,7 +14,7 @@ merge_ions(ions, ε) = begin
     sort!(ions, by=i -> i.z, alg=InsertionSort)
     mz, z, score = ions[begin].mz, ions[begin].z, ions[begin].score
     for i in ions[begin+1:end]
-        if MesCore.in_moe(i.mz, mz, ε) && i.z == z
+        if MesMS.in_moe(i.mz, mz, ε) && i.z == z
             mz = (mz * score + i.mz * i.score) / (score + i.score)
             score += i.score
         else
@@ -35,7 +35,7 @@ report_ions(Î, I, ε) = begin
     kept = 0
     for (îons, ions) in zip(Î, I)
         fs[length(îons)] = get(fs, length(îons), 0) + 1
-        kept += sum(map(î -> any(i -> i.z == î.z && MesCore.in_moe(i.mz, î.mz, ε), ions), îons))
+        kept += sum(map(î -> any(i -> i.z == î.z && MesMS.in_moe(i.mz, î.mz, ε), ions), îons))
         for ion in îons
             zs[ion.z] = get(zs, ion.z, 0) + 1
             m = floor(Int, ion.mz * ion.z / 1000)
@@ -64,7 +64,7 @@ slice_ms1(M1, M2, r=NaN) = begin
     M1 = map(M2) do m2
         r_ = isnan(r) ? m2.isolation_width / 2 : r
         while M1[i].id <= m2.id i += 1 end
-        return map(m -> MesCore.query(m.peaks, m2.activation_center - r_ - 2, m2.activation_center + r_ + 4), M1[i-8:i+7])
+        return map(m -> MesMS.query(m.peaks, m2.activation_center - r_ - 2, m2.activation_center + r_ + 4), M1[i-8:i+7])
     end
     return M1
 end
@@ -72,17 +72,17 @@ end
 evaluate(ms1, mz, r, zs, ε, V, τ, max_mode=false) = begin
     δs = map(zs) do z
         m = mz * z
-        i = argmax(IPV.ipv_w(m, V))
-        return max_mode ? (IPV.ipv_m(m, V)[i] - IPV.ipv_m(m, V)[1]) / z : 0.0
+        i = argmax(MesMS.ipv_w(m, V))
+        return max_mode ? (MesMS.ipv_m(m, V)[i] - MesMS.ipv_m(m, V)[1]) / z : 0.0
     end
     ions = map(ms1) do spec
-        peaks = MesCore.query(spec, mz - r - 2, mz + r + 1)
-        ions = [MesCore.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
+        peaks = MesMS.query(spec, mz - r - 2, mz + r + 1)
+        ions = [MesMS.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
         ions = filter(i -> i.m < length(V) && PepIso.prefilter(i, spec, ε, V, max_mode), ions)
         ions = PepIso.deisotope(ions, spec, τ, ε, V, :LP)
-        inten = sum(p -> p.inten, MesCore.query(peaks, mz - r, mz + r), init=1.0e-16)
+        inten = sum(p -> p.inten, MesMS.query(peaks, mz - r, mz + r), init=1.0e-16)
         ions = map(ions) do ion
-            ratio = sum(IPV.ipv_w(ion, V)[MesCore.argquery_δ(IPV.ipv_mz(ion, V), mz, r)], init=0.0)
+            ratio = sum(MesMS.ipv_w(ion, V)[MesMS.argquery_δ(MesMS.ipv_mz(ion, V), mz, r)], init=0.0)
             return (; mz=ion.mz::Float64, z=ion.z::Int, score=(ion.m * ion.x * ratio / inten)::Float64)
         end
         return filter(i -> i.score > 0, ions)
@@ -104,7 +104,7 @@ tune_mass(ion, ms1, ε) = begin
     peaks = map(ms1) do spec
         l, r = searchsortedfirst(spec, (1 - ε) * ion.mz), searchsortedlast(spec, (1 + ε) * ion.mz)
         εs = map(p -> abs(ion.mz - p.mz), spec[l:r])
-        return l <= r ? spec[argmin(εs)+l-1] : MesCore.Peak(0.0, 0.0)
+        return l <= r ? spec[argmin(εs)+l-1] : MesMS.Peak(0.0, 0.0)
     end
     mz = sum(p -> p.mz * p.inten, peaks) / sum(p -> p.inten, peaks)
     return isnan(mz) ? ion : (; ion..., mz)
@@ -123,12 +123,12 @@ write_ions(fmt, io, M, I; name="filename") = begin
         end
     elseif fmt == "ms2"
         @showprogress for (ms, ions) in zip(M, I)
-            MesCore.write_ms2(io, MesCore.fork(ms; ions=[MesCore.Ion(ion.mz, ion.z) for ion in ions]))
+            MesMS.write_ms2(io, MesMS.fork(ms; ions=[MesMS.Ion(ion.mz, ion.z) for ion in ions]))
         end
     elseif fmt == "mgf"
         @showprogress for (ms, ions) in zip(M, I)
             for (idx, ion) in enumerate(ions)
-                MesCore.write_mgf(io, MesCore.fork(ms; ions=[MesCore.Ion(ion.mz, ion.z)]), "$(name).$(ms.id).$(ms.id).$(ion.z).$(idx-1).dta")
+                MesMS.write_mgf(io, MesMS.fork(ms; ions=[MesMS.Ion(ion.mz, ion.z)]), "$(name).$(ms.id).$(ms.id).$(ion.z).$(idx-1).dta")
             end
         end
     end
@@ -140,21 +140,21 @@ detect_precursor(path, args) = begin
     r = args["w"] == "auto" ? NaN : parse(Float64, args["w"]) / 2
     ε = parse(Float64, args["e"]) * 1.0e-6
     τ_exclusion = parse(Float64, args["t"])
-    fs = Vector{Float64}(MesCore.parse_range(Float64, args["n"]))
-    zs = Vector{Int}(MesCore.parse_range(Int, args["z"]))
+    fs = Vector{Float64}(MesMS.parse_range(Float64, args["n"]))
+    zs = Vector{Int}(MesMS.parse_range(Int, args["z"]))
     fname = splitext(path)[1]
 
-    V = IPV.build_ipv(args["m"])
+    V = MesMS.build_ipv(args["m"])
 
     fname_m2 = fname * ".ms2"
     @info "MS2 loading from " * fname_m2
-    M2 = MesCore.read_ms2(fname_m2)
+    M2 = MesMS.read_ms2(fname_m2)
 
     fname_m1 = fname * ".ms1"
     @info "MS1 loading from " * fname_m1
-    M1 = MesCore.read_ms1(fname_m1)
-    prepend!(M1, [MesCore.MS1(id=typemin(Int)) for i in 1:8])
-    append!(M1, [MesCore.MS1(id=typemax(Int)) for i in 1:8])
+    M1 = MesMS.read_ms1(fname_m1)
+    prepend!(M1, [MesMS.MS1(id=typemin(Int)) for i in 1:8])
+    append!(M1, [MesMS.MS1(id=typemax(Int)) for i in 1:8])
     @info "MS1 slicing"
     M1 = slice_ms1(M1, M2, r)
 
@@ -163,7 +163,7 @@ detect_precursor(path, args) = begin
         r_ = isnan(r) ? ms2.isolation_width / 2 : r
         ions = evaluate(ms1[8:9], ms2.activation_center, r_, zs, ε, V, τ_exclusion, max_mode)
         if preserve
-            ions = filter(i -> !any(x -> i.z == x.z && MesCore.in_moe(i.mz, x.mz, ε), ms2.ions), ions)
+            ions = filter(i -> !any(x -> i.z == x.z && MesMS.in_moe(i.mz, x.mz, ε), ms2.ions), ions)
             append!(ions, [(; i.mz, i.z, score=Inf) for i in ms2.ions])
         end
         return sort(ions; by=i -> i.score, rev=true)
@@ -203,7 +203,7 @@ main() = begin
         "-m"
             help = "model file"
             metavar = "model"
-            default = joinpath(homedir(), ".PepPre/IPV.bson")
+            default = joinpath(homedir(), ".MesMS/IPV.bson")
         "-t"
             help = "exclusion threshold"
             metavar = "threshold"

@@ -5,8 +5,7 @@ version = "1.0.2"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
-MesCore = "0da6f6f1-6857-4856-ba89-6a679ab95268"
-PepIso = "9e738347-ca36-4573-85ad-8945ce437d8c"
+MesMS = "0da6f6f1-6857-4856-ba89-6a679ab95268"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 
 [compat]
