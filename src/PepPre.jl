@@ -69,16 +69,18 @@ slice_ms1(M1, M2, r=NaN) = begin
     return M1
 end
 
-evaluate(ms1, mz, r, zs, ε, V, τ, max_mode=false) = begin
+evaluate(ms1, mz, r, zs, ε, V, τ, mode) = begin
     δs = map(zs) do z
+        if mode == :mono return 0.0 end
+        # else max mode
         m = mz * z
         i = argmax(MesMS.ipv_w(m, V))
-        return max_mode ? (MesMS.ipv_m(m, V)[i] - MesMS.ipv_m(m, V)[1]) / z : 0.0
+        return (MesMS.ipv_m(m, V)[i] - MesMS.ipv_m(m, V)[1]) / z
     end
     ions = map(ms1) do spec
         peaks = MesMS.query(spec, mz - r - 2, mz + r + 1)
         ions = [MesMS.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
-        ions = filter(i -> i.m < length(V) && PepIso.prefilter(i, spec, ε, V, max_mode), ions)
+        ions = filter(i -> i.m < length(V) && PepIso.prefilter(i, spec, ε, V, mode), ions)
         ions = PepIso.deisotope(ions, spec, τ, ε, V, :LP)
         inten = sum(p -> p.inten, MesMS.query(peaks, mz - r, mz + r), init=1.0e-16)
         ions = map(ions) do ion
@@ -134,23 +136,31 @@ write_ions(fmt, io, M, I; name="filename") = begin
     end
 end
 
-detect_precursor(path, args) = begin
-    max_mode = args["max"]::Bool
-    preserve = args["i"]::Bool
-    r = args["w"] == "auto" ? NaN : parse(Float64, args["w"]) / 2
-    ε = parse(Float64, args["e"]) * 1.0e-6
-    τ_exclusion = parse(Float64, args["t"])
-    fs = Vector{Float64}(MesMS.parse_range(Float64, args["n"]))
+prepare(args) = begin
+    mode = Symbol(args["mode"])
+    if mode ∉ [:mono, :max]
+        @warn "unknown mode, use `mono`: $(mode)"
+        mode = :mono
+    end
     zs = Vector{Int}(MesMS.parse_range(Int, args["z"]))
-    fname = splitext(path)[1]
-
+    r = args["w"] == "auto" ? NaN : parse(Float64, args["w"]) / 2
+    τ = parse(Float64, args["t"])
+    ε = parse(Float64, args["e"]) * 1.0e-6
     V = MesMS.build_ipv(args["m"])
+    folds = Vector{Float64}(MesMS.parse_range(Float64, args["n"]))
+    preserve = args["i"]::Bool
+    fmts = split(args["f"], ",")
+    subdir = ':' ∈ args["n"]
+    out = args["o"]
+    return (; mode, zs, r, τ, ε, V, folds, preserve, fmts, subdir, out)
+end
 
-    fname_m2 = fname * ".ms2"
+detect_precursor(path; mode, zs, r, τ, ε, V, folds, preserve, fmts, subdir, out) = begin
+    fname_m2 = splitext(path)[1] * ".ms2"
     @info "MS2 loading from " * fname_m2
     M2 = MesMS.read_ms2(fname_m2)
 
-    fname_m1 = fname * ".ms1"
+    fname_m1 = splitext(path)[1] * ".ms1"
     @info "MS1 loading from " * fname_m1
     M1 = MesMS.read_ms1(fname_m1)
     prepend!(M1, [MesMS.MS1(id=typemin(Int)) for i in 1:8])
@@ -161,16 +171,14 @@ detect_precursor(path, args) = begin
     @info "evaluating"
     I = @showprogress map(zip(M1, M2)) do (ms1, ms2)
         r_ = isnan(r) ? ms2.isolation_width / 2 : r
-        ions = evaluate(ms1[8:9], ms2.activation_center, r_, zs, ε, V, τ_exclusion, max_mode)
+        ions = evaluate(ms1[8:9], ms2.activation_center, r_, zs, ε, V, τ, mode)
         if preserve
             ions = filter(i -> !any(x -> i.z == x.z && MesMS.in_moe(i.mz, x.mz, ε), ms2.ions), ions)
             append!(ions, [(; i.mz, i.z, score=Inf) for i in ms2.ions])
         end
         return sort(ions; by=i -> i.score, rev=true)
     end
-
-    subdir = ':' ∈ args["n"]
-    for fold in fs
+    for fold in folds
         @info "filtering by $(fold)-fold"
         I_ = filter_by_fold(I, fold)
 
@@ -180,9 +188,9 @@ detect_precursor(path, args) = begin
         end
 
         report_ions(I_, map(m -> m.ions, M2), ε)
-        name = basename(fname)
-        for fmt in split(args["f"], ",")
-            path_out = joinpath(subdir ? joinpath(args["o"], "$(fold)") : args["o"], "$(name).$(fmt)")
+        name = basename(splitext(path)[1])
+        for fmt in fmts
+            path_out = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(fmt)")
             mkpath(dirname(path_out))
             @info "result saving to " * path_out
             open(io -> write_ions(fmt, io, M2, I_; name), path_out * "~", write=true)
@@ -194,9 +202,10 @@ end
 main() = begin
     settings = ArgParse.ArgParseSettings(prog="PepPre")
     ArgParse.@add_arg_table! settings begin
-        "--max"
-            help = "max mode"
-            action = :store_true
+        "--mode"
+            help = "by mono or max mode"
+            metavar = "model"
+            default = "mono"
         "-i"
             help = "preserve original (instrument) ions"
             action = :store_true
@@ -238,9 +247,10 @@ main() = begin
             required = true
     end
     args = ArgParse.parse_args(settings)
+    sess = prepare(args)
     for path in args["data"], file in readdir(dirname(path))
         if file == basename(path) || (startswith(file, basename(path)) && endswith(file, ".ms2"))
-            detect_precursor(joinpath(dirname(path), file), args)
+            detect_precursor(joinpath(dirname(path), file); sess...)
         end
     end
 end
