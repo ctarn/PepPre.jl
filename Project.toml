@@ -6,6 +6,7 @@ version = "1.0.2"
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
 MesMS = "0da6f6f1-6857-4856-ba89-6a679ab95268"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 
 [compat]

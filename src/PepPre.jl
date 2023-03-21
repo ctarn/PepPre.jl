@@ -1,6 +1,7 @@
 module PepPre
 
 using Base: Filesystem
+using Printf
 
 import ArgParse
 import MesMS
@@ -27,8 +28,7 @@ merge_ions(ions, ε) = begin
 end
 
 report_ions(Î, I, ε) = begin
-    n̂ = sum(x -> length(x), Î)
-    n = sum(x -> length(x), I)
+    n̂, n = sum.(length, [Î, I])
     fs = Dict{Int, Int}()
     zs = Dict{Int, Int}()
     ms = Dict{Int, Int}()
@@ -42,21 +42,15 @@ report_ions(Î, I, ε) = begin
             ms[m] = get(ms, m, 0) + 1
         end
     end
-    println("-"^16)
-    println("#ion\t#MS2")
-    println("-"^16)
-    foreach(k -> println("$(k)\t$(get(fs, k, 0))"), minimum(keys(fs)):maximum(keys(fs)))
-    println("-"^16)
-    println("charge\t#ion")
-    println("-"^16)
-    foreach(k -> println("$(k)+\t$(get(zs, k, 0))"), minimum(keys(zs)):maximum(keys(zs)))
-    println("-"^16)
-    println("mass\t#ion")
-    println("-"^16)
-    foreach(k -> println("$(k)k Da\t$(get(ms, k, 0))"), minimum(keys(ms)):maximum(keys(ms)))
-    println("-"^16)
-    println("#ion: $(n) -> $(n̂) ($(round(n / length(I), digits=2))× -> $(round(n̂ / length(I), digits=2))×)")
-    println("kept: $(kept) / $(length(I)) = $(round(kept / length(I) * 100, digits=2))%")
+    println.(['-'^16, "#ion\t#MS2", '-'^16])
+    foreach(k -> println("$(k)\t$(get(fs, k, 0))"), range(extrema(keys(fs))...))
+    println.(['-'^16, "charge\t#ion", '-'^16])
+    foreach(k -> println("$(k)+\t$(get(zs, k, 0))"), range(extrema(keys(zs))...))
+    println.(['-'^16, "mass\t#ion", '-'^16])
+    foreach(k -> println("$(k)k Da\t$(get(ms, k, 0))"), range(extrema(keys(ms))...))
+    println('-'^16)
+    @printf("#ion: %d -> %d (%.2f× -> %.2f×)\n", n, n̂, n / length(I), n̂ / length(I))
+    @printf("kept: %d / %d = %.2f%%\n", kept, length(I), kept / length(I) * 100)
 end
 
 slice_ms1(M1, M2, r=NaN) = begin
