@@ -96,11 +96,10 @@ filter_by_fold(I, fold) = begin
     return I
 end
 
-tune_mass(ion, ms1, ε) = begin
-    peaks = map(ms1) do spec
-        l, r = searchsortedfirst(spec, (1 - ε) * ion.mz), searchsortedlast(spec, (1 + ε) * ion.mz)
-        εs = map(p -> abs(ion.mz - p.mz), spec[l:r])
-        return l <= r ? spec[argmin(εs)+l-1] : MesMS.Peak(0.0, 0.0)
+tune_mass(ion, ms1s, ε) = begin
+    peaks = map(ms1s) do spec
+        r = MesMS.argquery_ε(spec, ion.mz, ε)
+        return isempty(r) ? MesMS.Peak(0.0, 0.0) : MesMS.query_near(spec[r], ion.mz; by=x -> x.mz)
     end
     mz = sum(p -> p.mz * p.inten, peaks) / sum(p -> p.inten, peaks)
     return isnan(mz) ? ion : (; ion..., mz)
