@@ -187,7 +187,7 @@ detect_precursor(path; mode, zs, r, τ, ε, V, folds, preserve, fmts, subdir, ou
             path_out = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
             mkpath(dirname(path_out))
             @info "result saving to " * path_out
-            open(io -> write_ions(fmt, io, M2, I_; name), path_out * "~", write=true)
+            open(io -> write_ions(fmt, io, M2, I_; name), path_out * "~"; write=true)
             mv(path_out * "~", path_out; force=true)
         end
     end
