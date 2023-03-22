@@ -183,7 +183,8 @@ detect_precursor(path; mode, zs, r, τ, ε, V, folds, preserve, fmts, subdir, ou
         report_ions(I_, map(m -> m.ions, M2), ε)
         name = basename(splitext(path)[1])
         for fmt in fmts
-            path_out = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(fmt)")
+            ext = fmt ∈ ["csv", "tsv"] ? "precursor.$(fmt)" : fmt
+            path_out = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
             mkpath(dirname(path_out))
             @info "result saving to " * path_out
             open(io -> write_ions(fmt, io, M2, I_; name), path_out * "~", write=true)
