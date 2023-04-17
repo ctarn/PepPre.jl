@@ -132,23 +132,23 @@ end
 prepare(args) = begin
     mode = Symbol(args["mode"])
     if mode ∉ [:mono, :max]
-        @warn "unknown mode, use `mono`: $(mode)"
+        @warn "unknown mode, replaced with `mono`: $(mode)"
         mode = :mono
     end
-    zs = Vector{Int}(MesMS.parse_range(Int, args["z"]))
-    r = args["w"] == "auto" ? NaN : parse(Float64, args["w"]) / 2
-    τ = parse(Float64, args["t"])
-    ε = parse(Float64, args["e"]) * 1.0e-6
-    V = MesMS.build_ipv(args["m"])
-    folds = Vector{Float64}(MesMS.parse_range(Float64, args["n"]))
-    preserve = args["i"]::Bool
-    fmts = split(args["f"], ",")
-    subdir = ':' ∈ args["n"]
-    out = args["o"]
-    return (; mode, zs, r, τ, ε, V, folds, preserve, fmts, subdir, out)
+    V = MesMS.build_ipv(args["ipv"])
+    r = args["width"] == "auto" ? NaN : parse(Float64, args["width"]) / 2
+    zs = Vector{Int}(MesMS.parse_range(Int, args["charge"]))
+    ε = parse(Float64, args["error"]) * 1.0e-6
+    τ = parse(Float64, args["thres"])
+    preserve = args["inst"]::Bool
+    folds = Vector{Float64}(MesMS.parse_range(Float64, args["fold"]))
+    fmts = split(args["fmt"], ",")
+    subdir = ':' ∈ args["fold"]
+    out = args["out"]
+    return (; mode, V, r, zs, ε, τ, preserve, folds, fmts, subdir, out)
 end
 
-detect_precursor(path; mode, zs, r, τ, ε, V, folds, preserve, fmts, subdir, out) = begin
+detect_precursor(path; mode, V, r, zs, ε, τ, preserve, folds, fmts, subdir, out) = begin
     fname_m2 = splitext(path)[1] * ".ms2"
     @info "MS2 loading from " * fname_m2
     M2 = MesMS.read_ms2(fname_m2)
@@ -198,40 +198,40 @@ main() = begin
     ArgParse.@add_arg_table! settings begin
         "--mode"
             help = "by mono or max mode"
-            metavar = "model"
+            metavar = "mode"
             default = "mono"
-        "-i"
-            help = "preserve original (instrument) ions"
-            action = :store_true
-        "-m"
+        "--ipv"
             help = "model file"
             metavar = "model"
             default = joinpath(homedir(), ".MesMS/IPV.bson")
-        "-t"
-            help = "exclusion threshold"
-            metavar = "threshold"
-            default = "1.0"
-        "-e"
-            help = "m/z error"
-            metavar = "ppm"
-            default = "10.0"
-        "-w"
+        "--width", "-w"
             help = "isolation width"
             metavar = "width"
             default = "auto"
-        "-z"
+        "--charge", "-z"
             help = "charge states"
             metavar = "min:max"
             default = "2:6"
-        "-n"
+        "--error", "-e"
+            help = "m/z error"
+            metavar = "ppm"
+            default = "10.0"
+        "--thres", "-t"
+            help = "exclusion threshold"
+            metavar = "threshold"
+            default = "1.0"
+        "--inst", "-i"
+            help = "preserve original (instrument) ions"
+            action = :store_true
+        "--fold", "-n"
             help = "number of precursor ions"
             metavar = "fold"
             default = "4.0"
-        "-f"
+        "--fmt", "-f"
             help = "output format"
             metavar = "csv,tsv,ms2,mgf"
             default = "ms2"
-        "-o"
+        "--out", "-o"
             help = "output directory"
             metavar = "output"
             default = "./out/"
