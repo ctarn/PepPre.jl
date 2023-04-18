@@ -236,17 +236,16 @@ main() = begin
             metavar = "output"
             default = "./out/"
         "data"
-            help = "list of .ms2 files"
+            help = "list of .ms2 files or directories; .ms1 files should be in the same directory"
             nargs = '+'
             required = true
     end
     args = ArgParse.parse_args(settings)
+    paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".ms2"); init=String[])
+    @info "file paths of selected data:"
+    foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
     sess = prepare(args)
-    for path in args["data"], file in readdir(dirname(path))
-        if file == basename(path) || (startswith(file, basename(path)) && endswith(file, ".ms2"))
-            detect_precursor(joinpath(dirname(path), file); sess...)
-        end
-    end
+    detect_precursor.(paths; sess...)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
