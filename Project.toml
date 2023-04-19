@@ -1,13 +1,19 @@
 name = "PepPre"
 uuid = "4993a608-c569-46d7-95b9-1fba1b0e5595"
 authors = ["Tarn Yeong Ching <i@ctarn.io>"]
-version = "1.0.3"
+version = "1.1.0-dev"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+Dash = "1b08a953-4be3-4667-9a23-3db579824955"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 MesMS = "0da6f6f1-6857-4856-ba89-6a679ab95268"
+MesUtil = "f93118ae-a11b-4124-a8dd-198981c00471"
+PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [compat]
 julia = "1"

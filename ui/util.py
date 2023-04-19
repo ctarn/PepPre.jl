@@ -50,11 +50,13 @@ def get_content(*path, shared=False, zipped=False):
         if shared: return os.path.join("tmp", "shared", path)
         else: return os.path.join("tmp", f"{get_arch()}.{platform.system()}", path)
 
-def run_cmd(cmd):
+def run_cmd(cmd, handles=None, skip=False):
+    if skip: return
     print("cmd: " + str(cmd))
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         text=True, encoding="utf-8", creationflags=subprocess.CREATE_NO_WINDOW if is_windows else 0,
     )
+    if handles is not None: handles.append(p)
     while p.poll() is None: print(p.stdout.readline(), end="")
     for line in p.stdout.readlines(): print(line, end="")
 
@@ -78,10 +80,10 @@ def load_task(path, vars):
         print("task failed to loading from", path)
 
 # UI
-def show_headline(url, frame, columnspan, column=0, row=0):
+def show_headline(url, frame, column=0, row=0, columnspan=1):
     try:
         text = request.urlopen(f"{url}/headline").read().decode("utf-8")
-        if len(text) > 0:
+        if text.startswith("NEWS:"):
             ttk.Label(frame, text=text).grid(column=column, row=row, columnspan=columnspan)
     except:
         pass

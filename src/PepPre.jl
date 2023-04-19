@@ -130,6 +130,7 @@ write_ions(fmt, io, M, I; name="filename") = begin
 end
 
 prepare(args) = begin
+    inst = args["inst"]::Bool
     mode = Symbol(args["mode"])
     if mode ∉ [:mono, :max]
         @warn "unknown mode, replaced with `mono`: $(mode)"
@@ -140,15 +141,14 @@ prepare(args) = begin
     zs = Vector{Int}(MesMS.parse_range(Int, args["charge"]))
     ε = parse(Float64, args["error"]) * 1.0e-6
     τ = parse(Float64, args["thres"])
-    preserve = args["inst"]::Bool
     folds = Vector{Float64}(MesMS.parse_range(Float64, args["fold"]))
     fmts = split(args["fmt"], ",")
     subdir = ':' ∈ args["fold"]
     out = args["out"]
-    return (; mode, V, r, zs, ε, τ, preserve, folds, fmts, subdir, out)
+    return (; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out)
 end
 
-detect_precursor(path; mode, V, r, zs, ε, τ, preserve, folds, fmts, subdir, out) = begin
+detect_precursor(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) = begin
     fname_m2 = splitext(path)[1] * ".ms2"
     @info "MS2 loading from " * fname_m2
     M2 = MesMS.read_ms2(fname_m2)
@@ -165,7 +165,7 @@ detect_precursor(path; mode, V, r, zs, ε, τ, preserve, folds, fmts, subdir, ou
     I = @showprogress map(zip(M1, M2)) do (ms1, ms2)
         r_ = isnan(r) ? ms2.isolation_width / 2 : r
         ions = evaluate(ms1[8:9], ms2.activation_center, r_, zs, ε, V, τ, mode)
-        if preserve
+        if inst
             ions = filter(i -> !any(x -> i.z == x.z && MesMS.in_moe(i.mz, x.mz, ε), ms2.ions), ions)
             append!(ions, [(; i.mz, i.z, score=Inf) for i in ms2.ions])
         end
@@ -196,17 +196,20 @@ end
 main() = begin
     settings = ArgParse.ArgParseSettings(prog="PepPre")
     ArgParse.@add_arg_table! settings begin
+        "--inst"
+            help = "preserve original (instrument) ions"
+            action = :store_true
         "--mode"
             help = "by mono or max mode"
-            metavar = "mode"
+            metavar = "mono|max"
             default = "mono"
         "--ipv"
-            help = "model file"
-            metavar = "model"
+            help = "IPV file"
+            metavar = "IPV"
             default = joinpath(homedir(), ".MesMS/IPV.bson")
         "--width", "-w"
             help = "isolation width"
-            metavar = "width"
+            metavar = "Th"
             default = "auto"
         "--charge", "-z"
             help = "charge states"
@@ -218,11 +221,8 @@ main() = begin
             default = "10.0"
         "--thres", "-t"
             help = "exclusion threshold"
-            metavar = "threshold"
+            metavar = "(≥0.0)"
             default = "1.0"
-        "--inst", "-i"
-            help = "preserve original (instrument) ions"
-            action = :store_true
         "--fold", "-n"
             help = "number of precursor ions"
             metavar = "fold"
@@ -256,5 +256,10 @@ julia_main()::Cint = begin
     main()
     return 0
 end
+
+include("PepPreView.jl")
+
+main_PepPre()::Cint = julia_main()
+main_PepPreView()::Cint = PepPreView.julia_main()
 
 end
