@@ -44,6 +44,15 @@ footer {
     justify-content: space-around;
 }
 
+div.ui {
+    width: 50%;
+    float: right;
+}
+
+div.ui img {
+    width: 100%;
+}
+
 div.release section {
     margin: 16px 0;
 }
@@ -112,7 +121,33 @@ div.release section ol {
 </ul>
 
 <h2>Release</h2>
-<div class="release"><section><time>2023-3-10</time>
+<div class="ui"><img src="fig/PepPre_ui.png" /></div>
+<div class="release"><section><time>2023-4-19</time>
+<h4>PepPre 1.1.0</h4>
+<div>
+<a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.1.0/PepPre-1.1.0.x86_64.Linux.zip">Linux</a>
+|
+<a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.1.0/PepPre-1.1.0.x86_64.Darwin.zip">macOS</a>
+|
+<a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.1.0/PepPre-1.1.0.x86_64.Windows.zip">Windows</a>
+</div>
+<div>Note:
+<ol>
+    <li>embed `PepPepView` which can display deisotoped precursor ions and corresponding identification.</li>
+    <li>adjust arguments of CLI interface.</li>
+</ol>
+</div>
+</section><section><time>2023-3-22</time>
+<h4>PepPre 1.0.3</h4>
+<div>Note:
+<ol>
+    <li>the version is not publicly released.</li>
+    <li>internal changes.</li>
+    <li>adjust file type filtering of input data.</li>
+    <li>adjust ext of output file: export as `{file_name}.precursor.[csv|tsv]` if `csv` or `tsv` is selected.</li>
+</ol>
+</div>
+</section><section><time>2023-3-10</time>
 <h4>PepPre 1.0.2</h4>
 <div>
 <a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.0.2/PepPre-1.0.2.x86_64.Linux.zip">Linux</a>
