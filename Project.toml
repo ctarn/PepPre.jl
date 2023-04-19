@@ -1,7 +1,7 @@
 name = "PepPre"
 uuid = "4993a608-c569-46d7-95b9-1fba1b0e5595"
 authors = ["Tarn Yeong Ching <i@ctarn.io>"]
-version = "1.1.0-dev"
+version = "1.1.0"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
