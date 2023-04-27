@@ -47,7 +47,7 @@ def on_exit():
         PepPreView.do_stop()
         win.destroy()
 
-ttk.Button(main, text="×", command=on_exit).grid(column=1, row=0, sticky="E")
+ttk.Button(main, text="×", command=on_exit).grid(column=0, row=0, sticky="E")
 
 util.center_window(win)
 
