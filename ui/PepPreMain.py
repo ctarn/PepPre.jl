@@ -22,7 +22,6 @@ Note:
 """
 
 main = ttk.Frame()
-main.grid(column=0, row=0)
 
 if util.is_darwin:
     path_mono = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono"

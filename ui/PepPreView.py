@@ -25,7 +25,6 @@ Note:
 """
 
 main = ttk.Frame()
-main.grid(column=0, row=0)
 
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
