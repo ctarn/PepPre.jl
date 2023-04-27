@@ -4,6 +4,8 @@ import threading
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 
+import ttkbootstrap
+
 import meta
 import util
 
