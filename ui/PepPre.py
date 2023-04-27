@@ -11,24 +11,8 @@ import util
 
 os.makedirs(meta.homedir, exist_ok=True)
 
-win = tk.Tk()
-win.title(meta.name)
-win.iconphoto(True, tk.PhotoImage(file=util.get_content(f"{meta.name}.png", shared=True)))
-win.resizable(False, False)
-win.overrideredirect(True)
-util.center_window(win)
-
-x_win, y_win = 0, 0
-
-def on_click(e):
-    global x_win, y_win
-    x_win, y_win = e.x, e.y
-
-def on_drag(e):
-    win.geometry(f"+{e.x_root - x_win}+{e.y_root - y_win}")
-
-win.bind("<Button-1>", on_click)
-win.bind("<B1-Motion>", on_drag)
+pos = [0.0, 0.0]
+win = util.create_window(pos)
 
 main = ttk.Frame(win)
 main.grid(column=0, row=0, padx=16, pady=8)
