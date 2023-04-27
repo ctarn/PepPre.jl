@@ -102,7 +102,7 @@ def run_peppreview(paths):
 
 def do_load():
     path = filedialog.askopenfilename(filetypes=(("Configuration", "*.task"), ("All", "*.*")))
-    if len(path) > 0: util.load_task(path)
+    if len(path) > 0: util.load_task(path, vars)
 
 def do_autosave():
     util.save_task(path_autosave, {k: v for k, v in vars.items() if v.get() != vars_spec[k]["value"]})
