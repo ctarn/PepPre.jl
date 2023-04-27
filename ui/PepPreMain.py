@@ -249,7 +249,7 @@ if not util.is_windows:
     ttk.Label(main, text="Mono Runtime:").grid(column=0, row=row, sticky="W")
     ttk.Entry(main, textvariable=vars["mono"]).grid(column=1, row=row, **util.sty_entry)
     ttk.Button(main, text="Select", command=do_select_mono).grid(column=2, row=row, **util.sty_button)
-row += 1
+    row += 1
 
 def do_select_msconvert():
     path = filedialog.askopenfilename()
