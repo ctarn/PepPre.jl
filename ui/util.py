@@ -92,3 +92,6 @@ def center_window(win):
     x = int((win.winfo_screenwidth() - win.winfo_width()) / 2)
     y = int((win.winfo_screenheight() - win.winfo_height()) / 2)
     win.geometry(f"+{x}+{y}")
+
+sty_entry = {"sticky": "WE", "pady": 1}
+sty_button = {"sticky": "WE", "padx": 4, "pady": 1}

@@ -25,6 +25,7 @@ Note:
 """
 
 main = ttk.Frame()
+main.grid(sticky="SNWE")
 
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
@@ -41,6 +42,7 @@ util.load_task(path_autosave, vars)
 row = 0
 ttk.Label(main, width=20 if util.is_windows else 16).grid(column=0, row=row)
 ttk.Label(main, width=80 if util.is_windows else 60).grid(column=1, row=row)
+ttk.Label(main, width=12 if util.is_windows else 10).grid(column=2, row=row)
 
 def do_select_data():
     filetypes = (("MS2", "*.ms2"), ("All", "*.*"))
@@ -55,8 +57,8 @@ def do_select_data():
         vars["out"].set(os.path.join(os.path.dirname(files[0]), "out"))
 
 ttk.Label(main, text="MS Data:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["data"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_data).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["data"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_data).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_ipv():
@@ -64,8 +66,8 @@ def do_select_ipv():
     if len(path) > 0: vars["ipv"].set(path)
 
 ttk.Label(main, text="IPV:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["ipv"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_ipv).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["ipv"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_ipv).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_psm():
@@ -73,8 +75,8 @@ def do_select_psm():
     if len(path) > 0: vars["psm"].set(path)
 
 ttk.Label(main, text="PSM:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["psm"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_psm).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["psm"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_psm).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_pfind():
@@ -82,8 +84,8 @@ def do_select_pfind():
     if len(path) > 0: vars["out"].set(path)
 
 ttk.Label(main, text="Output Directory:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["out"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_pfind).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["out"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_pfind).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def run_peppreview(paths):
@@ -154,8 +156,8 @@ def do_select_peppreview():
     if len(path) > 0: vars["peppreview"].set(path)
 
 ttk.Label(main, text="PepPreView:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["peppreview"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_peppreview).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["peppreview"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_peppreview).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_pfind():
@@ -163,8 +165,8 @@ def do_select_pfind():
     if len(path) > 0: vars["cfg"].set(path)
 
 ttk.Label(main, text="pFind Directory:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["cfg"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_pfind).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["cfg"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_pfind).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_new_port():
@@ -174,8 +176,8 @@ def do_new_port():
 
 do_new_port()
 ttk.Label(main, text="URL:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["url"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="New Port", command=do_new_port).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["url"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="New Port", command=do_new_port).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 ttk.Label(main, text=footnote, justify="left").grid(column=0, row=row, columnspan=3, sticky="WE")

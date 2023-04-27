@@ -22,6 +22,7 @@ Note:
 """
 
 main = ttk.Frame()
+main.grid(sticky="SNWE")
 
 if util.is_darwin:
     path_mono = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono"
@@ -55,6 +56,7 @@ util.load_task(path_autosave, vars)
 row = 0
 ttk.Label(main, width=20 if util.is_windows else 16).grid(column=0, row=row)
 ttk.Label(main, width=80 if util.is_windows else 60).grid(column=1, row=row)
+ttk.Label(main, width=12 if util.is_windows else 10).grid(column=2, row=row)
 
 def do_select_data():
     if util.is_windows: filetypes = (("All", "*.*"),)
@@ -70,8 +72,8 @@ def do_select_data():
         vars["out"].set(os.path.join(os.path.dirname(files[0]), "out"))
 
 ttk.Label(main, text="Data:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["data"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_data).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["data"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_data).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_ipv():
@@ -79,8 +81,8 @@ def do_select_ipv():
     if len(path) > 0: vars["ipv"].set(path)
 
 ttk.Label(main, text="IPV:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["ipv"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_ipv).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["ipv"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_ipv).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 ttk.Label(main, text="Isolation Width:").grid(column=0, row=row, sticky="W")
@@ -91,22 +93,22 @@ row += 1
 ttk.Label(main, text="Charge Range:").grid(column=0, row=row, sticky="W")
 frm_charge = ttk.Frame(main)
 frm_charge.grid(column=1, row=row, sticky="WE")
-ttk.Entry(frm_charge, textvariable=vars["charge_min"]).grid(column=0, row=0, sticky="WE")
+ttk.Entry(frm_charge, textvariable=vars["charge_min"]).grid(column=0, row=0, **util.sty_entry)
 ttk.Label(frm_charge, text=" - ").grid(column=1, row=0, sticky="WE")
-ttk.Entry(frm_charge, textvariable=vars["charge_max"]).grid(column=2, row=0, sticky="WE")
+ttk.Entry(frm_charge, textvariable=vars["charge_max"]).grid(column=2, row=0, **util.sty_entry)
 row += 1
 
 ttk.Label(main, text="Mass Error:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["error"]).grid(column=1, row=row, sticky="WE")
+ttk.Entry(main, textvariable=vars["error"]).grid(column=1, row=row, **util.sty_entry)
 ttk.Label(main, text="ppm").grid(column=2, row=row, sticky="W")
 row += 1
 
 ttk.Label(main, text="Exclusion Threshold:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["exclusion"]).grid(column=1, row=row, sticky="WE")
+ttk.Entry(main, textvariable=vars["exclusion"]).grid(column=1, row=row, **util.sty_entry)
 row += 1
 
 ttk.Label(main, text="Precursor Number:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["fold"]).grid(column=1, row=row, sticky="WE")
+ttk.Entry(main, textvariable=vars["fold"]).grid(column=1, row=row, **util.sty_entry)
 ttk.Label(main, text="fold").grid(column=2, row=row, sticky="W")
 row += 1
 
@@ -118,7 +120,7 @@ ttk.Label(main, text="Output Format:").grid(column=0, row=row, sticky="W")
 frm_format = ttk.Frame(main)
 frm_format.grid(column=1, row=row)
 for i, fmt in enumerate(fmts):
-    ttk.Checkbutton(frm_format, text=fmt.upper(), variable=vars[f"fmt_{fmt}"]).grid(column=i, row=0)
+    ttk.Checkbutton(frm_format, text=fmt.upper(), variable=vars[f"fmt_{fmt}"]).grid(column=i, row=0, padx=8)
 row += 1
 
 def do_select_out():
@@ -126,8 +128,8 @@ def do_select_out():
     if len(path) > 0: vars["out"].set(path)
 
 ttk.Label(main, text="Output Directory:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["out"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_out).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["out"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_out).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def run_thermorawread(data, out):
@@ -226,8 +228,8 @@ def do_select_peppre():
     if len(path) > 0: vars["peppre"].set(path)
 
 ttk.Label(main, text="PepPre:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["peppre"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_peppre).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["peppre"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_peppre).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_thermorawread():
@@ -235,8 +237,8 @@ def do_select_thermorawread():
     if len(path) > 0: vars["thermorawread"].set(path)
 
 ttk.Label(main, text="ThermoRawRead:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["thermorawread"]).grid(column=1, row=row, sticky="WE")
-ttk.Button(main, text="Select", command=do_select_thermorawread).grid(column=2, row=row, sticky="W")
+ttk.Entry(main, textvariable=vars["thermorawread"]).grid(column=1, row=row, **util.sty_entry)
+ttk.Button(main, text="Select", command=do_select_thermorawread).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_mono():
@@ -245,8 +247,8 @@ def do_select_mono():
 
 if not util.is_windows:
     ttk.Label(main, text="Mono Runtime:").grid(column=0, row=row, sticky="W")
-    ttk.Entry(main, textvariable=vars["mono"]).grid(column=1, row=row, sticky="WE")
-    ttk.Button(main, text="Select", command=do_select_mono).grid(column=2, row=row, sticky="W")
+    ttk.Entry(main, textvariable=vars["mono"]).grid(column=1, row=row, **util.sty_entry)
+    ttk.Button(main, text="Select", command=do_select_mono).grid(column=2, row=row, **util.sty_button)
 row += 1
 
 def do_select_msconvert():
@@ -255,8 +257,8 @@ def do_select_msconvert():
 
 if util.is_windows:
     ttk.Label(main, text="MsConvert:").grid(column=0, row=row, sticky="W")
-    ttk.Entry(main, textvariable=vars["msconvert"]).grid(column=1, row=row, sticky="WE")
-    ttk.Button(main, text="Select", command=do_select_msconvert).grid(column=2, row=row, sticky="W")
+    ttk.Entry(main, textvariable=vars["msconvert"]).grid(column=1, row=row, **util.sty_entry)
+    ttk.Button(main, text="Select", command=do_select_msconvert).grid(column=2, row=row, **util.sty_button)
     row += 1
 
 ttk.Label(main, text=footnote, justify="left").grid(column=0, row=row, columnspan=3, sticky="WE")
