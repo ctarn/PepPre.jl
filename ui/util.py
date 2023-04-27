@@ -87,3 +87,8 @@ def show_headline(url, frame, column=0, row=0, columnspan=1):
             ttk.Label(frame, text=text).grid(column=column, row=row, columnspan=columnspan)
     except:
         pass
+
+def center_window(win):
+    x = int((win.winfo_screenwidth() - win.winfo_width()) / 2)
+    y = int((win.winfo_screenheight() - win.winfo_height()) / 2)
+    win.geometry(f"+{x}+{y}")
