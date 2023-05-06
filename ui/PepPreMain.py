@@ -92,10 +92,10 @@ row += 1
 
 ttk.Label(main, text="Charge Range:").grid(column=0, row=row, sticky="W")
 frm_charge = ttk.Frame(main)
-frm_charge.grid(column=1, row=row, sticky="WE")
-ttk.Entry(frm_charge, textvariable=vars["charge_min"]).grid(column=0, row=0, **util.sty_entry)
-ttk.Label(frm_charge, text=" - ").grid(column=1, row=0, sticky="WE")
-ttk.Entry(frm_charge, textvariable=vars["charge_max"]).grid(column=2, row=0, **util.sty_entry)
+frm_charge.grid(column=1, row=row, **util.sty_entry)
+ttk.Entry(frm_charge, textvariable=vars["charge_min"]).pack(side="left", fill="x", expand=True)
+ttk.Label(frm_charge, text="-").pack(side="left")
+ttk.Entry(frm_charge, textvariable=vars["charge_max"]).pack(side="left", fill="x", expand=True)
 row += 1
 
 ttk.Label(main, text="Mass Error:").grid(column=0, row=row, sticky="W")
