@@ -22,7 +22,7 @@ Note:
 """
 
 main = ttk.Frame()
-main.grid(sticky="SNWE")
+main.pack(fill="both")
 
 if util.is_darwin:
     path_mono = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono"

@@ -25,7 +25,7 @@ Note:
 """
 
 main = ttk.Frame()
-main.grid(sticky="SNWE")
+main.pack(fill="both")
 
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},

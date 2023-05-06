@@ -15,25 +15,23 @@ pos = [0.0, 0.0]
 win = util.create_window(pos)
 
 main = ttk.Frame(win)
-main.grid(column=0, row=0, padx=16, pady=8)
+main.pack(padx=16, pady=8)
 
-row = 0
-# headline
-row += 1
+headline = tk.StringVar()
+ttk.Label(main, textvariable=headline, justify="center").pack()
 
 notebook = ttk.Notebook(main)
-notebook.grid(column=0, row=row, sticky="WE")
-row += 1
+notebook.pack(fill="x")
 
 console = scrolledtext.ScrolledText(main, height=16, state="disabled")
-console.grid(column=0, row=row, sticky="WE")
-row += 1
-ttk.Label(main, text=meta.copyright, justify="center").grid(column=0, row=row)
+console.pack(fill="x")
+
+ttk.Label(main, text=meta.copyright, justify="center").pack()
 
 sys.stdout = util.Console(console)
 sys.stderr = util.Console(console)
 if getattr(sys, 'frozen', False):
-    threading.Thread(target=lambda: util.show_headline(meta.server, main)).start()
+    threading.Thread(target=lambda: util.show_headline(headline, meta.server)).start()
 
 import PepPreMain
 notebook.add(PepPreMain.main, text="PepPre")
@@ -47,7 +45,7 @@ def on_exit():
         PepPreView.do_stop()
         win.destroy()
 
-ttk.Button(main, text="×", command=on_exit).grid(column=0, row=0, sticky="E")
+ttk.Button(main, text="×", command=on_exit).place(relx=1.0, rely=0.0, anchor="ne")
 
 util.center_window(win)
 

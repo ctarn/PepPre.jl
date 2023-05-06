@@ -83,11 +83,11 @@ def load_task(path, vars):
         print("task failed to loading from", path)
 
 # UI
-def show_headline(url, frame, column=0, row=0, columnspan=1):
+def show_headline(var, url):
     try:
         text = request.urlopen(f"{url}/headline").read().decode("utf-8")
         if text.startswith("NEWS:"):
-            ttk.Label(frame, text=text).grid(column=column, row=row, columnspan=columnspan)
+            var.set(text)
     except:
         pass
 
