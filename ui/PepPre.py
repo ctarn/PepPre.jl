@@ -2,7 +2,7 @@ import os
 import sys
 import threading
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import ttk, messagebox, scrolledtext
 
 import ttkbootstrap
 
@@ -40,7 +40,7 @@ import PepPreView
 notebook.add(PepPreView.main, text="PepPreView")
 
 def on_exit():
-    if (not (PepPreMain.running or PepPreView.running)) or tk.messagebox.askokcancel("Quit", "Task running. Quit now?"):
+    if (not (PepPreMain.running or PepPreView.running)) or messagebox.askokcancel("Quit", "Task running. Quit now?"):
         PepPreMain.do_stop()
         PepPreView.do_stop()
         win.destroy()
