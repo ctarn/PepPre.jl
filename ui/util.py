@@ -5,7 +5,6 @@ import platform
 import subprocess
 import sys
 import tkinter as tk
-from tkinter import ttk
 from urllib import request
 
 import meta
@@ -83,19 +82,6 @@ def load_task(path, vars):
         print("task failed to loading from", path)
 
 # UI
-def show_headline(var, url):
-    try:
-        text = request.urlopen(f"{url}/headline").read().decode("utf-8")
-        if text.startswith("NEWS:"):
-            var.set(text)
-    except:
-        pass
-
-def center_window(win):
-    x = int((win.winfo_screenwidth() - win.winfo_width()) / 2)
-    y = int((win.winfo_screenheight() - win.winfo_height()) / 2)
-    win.geometry(f"+{x}+{y}")
-
 sty_entry = {"sticky": "WE", "pady": 1}
 sty_button = {"sticky": "WE", "padx": 4, "pady": 1}
 
@@ -115,3 +101,16 @@ def create_window(pos, margin=16):
     win.bind("<Button-1>", on_click)
     win.bind("<B1-Motion>", on_drag)
     return win
+
+def center_window(win):
+    x = int((win.winfo_screenwidth() - win.winfo_width()) / 2)
+    y = int((win.winfo_screenheight() - win.winfo_height()) / 2)
+    win.geometry(f"+{x}+{y}")
+
+def show_headline(var, url):
+    try:
+        text = request.urlopen(f"{url}/headline").read().decode("utf-8")
+        if text.startswith("NEWS:"):
+            var.set(text)
+    except:
+        pass
