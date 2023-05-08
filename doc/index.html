@@ -4,7 +4,7 @@
 <title>PepPre</title>
 <style>
 * {
-    font-family: Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: dimgrey;
 }
 
@@ -42,6 +42,18 @@ footer {
     margin: 16px auto;
     display: flex;
     justify-content: space-around;
+}
+
+header {
+    height: 64px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+header img {
+    height: 100%;
 }
 
 div.ui {
@@ -82,12 +94,12 @@ div.release section ol {
 </head>
 <body>
 <div class="wrapper">
-<header><h1>PepPre</h1></header>
+<header><img src="fig/PepPre.svg" alt="logo"/><h1>PepPre</h1></header>
 <main>
 <h2>PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors</h2>
 
 <h2>Abstract</h2>
-<div class="toc"><embed src="fig/PepPre_toc.svg" type="image/svg+xml"/></div>
+<div class="toc"><img src="fig/PepPre_toc.svg" alt="toc"/></div>
 <p>
     Accurate and comprehensive peptide precursor ions are crucial to tandem mass spectrometry-based peptide identification.
     An identification engine can greatly benefit from the search space reduction hinted by credible and detailed precursors.
@@ -121,7 +133,7 @@ div.release section ol {
 </ul>
 
 <h2>Release</h2>
-<div class="ui"><img src="fig/PepPre_ui.png" /></div>
+<div class="ui"><img src="fig/PepPre_ui.png" alt="ui"/></div>
 {{ release }}
 
 <h2>Q&A</h2>
