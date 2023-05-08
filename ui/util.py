@@ -7,8 +7,6 @@ import sys
 import tkinter as tk
 from urllib import request
 
-import meta
-
 # OS
 is_linux = platform.system() == "Linux"
 is_darwin = platform.system() == "Darwin"
