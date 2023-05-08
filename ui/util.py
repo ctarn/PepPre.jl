@@ -85,23 +85,6 @@ def load_task(path, vars):
 sty_entry = {"sticky": "WE", "pady": 1}
 sty_button = {"sticky": "WE", "padx": 4, "pady": 1}
 
-def create_window(pos, margin=16):
-    win = tk.Tk()
-    win.title(meta.name)
-    win.iconphoto(True, tk.PhotoImage(file=get_content(f"{meta.name}.png", shared=True)))
-    win.resizable(False, False)
-    win.overrideredirect(True)
-    center_window(win)
-    def on_click(e):
-        pos[0], pos[1] = e.x, e.y
-    def on_drag(e):
-        if (min(pos[0], abs(pos[0] - win.winfo_width())) < margin or
-            min(pos[1], abs(pos[1] - win.winfo_height())) < margin):
-            win.geometry(f"+{e.x_root - pos[0]}+{e.y_root - pos[1]}")
-    win.bind("<Button-1>", on_click)
-    win.bind("<B1-Motion>", on_drag)
-    return win
-
 def center_window(win):
     x = int((win.winfo_screenwidth() - win.winfo_width()) / 2)
     y = int((win.winfo_screenheight() - win.winfo_height()) / 2)

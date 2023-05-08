@@ -17,7 +17,6 @@ Note:
 ⧫ For .ms2 files, corresponding .ms1 files should be in the same directory.
 ⧫ The `IPV` (isotopic pattern vectors) can be automatically generated and cached to specified path.
 ⧫ The `Isolation Width` can be set as `auto` if .raw files are provided or using .ms2 files containing `IsolationWidth` line.
-⧫ Drag the border to move the window; click `x` to close it.
 ⧫ Select multiple data files using something like `Ctrl + A`.
 ⧫ Free feel to contact me if you have any questions :).
 """
