@@ -2,7 +2,7 @@ import os
 import sys
 import threading
 import tkinter as tk
-from tkinter import ttk, messagebox, scrolledtext
+from tkinter import ttk, messagebox
 
 import ttkbootstrap
 
@@ -26,7 +26,7 @@ ttk.Label(main, textvariable=headline, justify="center").pack()
 notebook = ttk.Notebook(main)
 notebook.pack(fill="x")
 
-console = scrolledtext.ScrolledText(main, height=16, state="disabled")
+console = tk.Text(main, height=12, state="disabled")
 console.pack(fill="x")
 
 ttk.Label(main, text=meta.copyright, justify="center").pack()
