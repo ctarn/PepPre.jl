@@ -42,6 +42,9 @@ notebook.add(PepPreMain.main, text="PepPre")
 import PepPreView
 notebook.add(PepPreView.main, text="PepPreView")
 
+import citation
+notebook.add(citation.main, text="Citation")
+
 def on_exit():
     if (not any([PepPreMain.running, PepPreView.running]) or
         messagebox.askokcancel("Quit", "Task running. Quit now?")):
