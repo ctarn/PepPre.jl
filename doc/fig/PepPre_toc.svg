@@ -83,8 +83,10 @@
             </g>
         </g>
     </g>
-    <g transform="matrix(1,0,0,1,203.875,87.2526)">
-        <text x="368.094px" y="266.568px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:96px;">+</text>
+    <g transform="matrix(1,0,0,1,203.875,77.7203)">
+        <g transform="matrix(96,0,0,96,367.325,266.568)">
+            <path d="M0.334,-0.287L0.334,-0.506L0.266,-0.506L0.266,-0.287L0.048,-0.287L0.048,-0.219L0.266,-0.219L0.266,-0L0.334,-0L0.334,-0.219L0.552,-0.219L0.552,-0.287L0.334,-0.287Z" style="fill-rule:nonzero;"/>
+        </g>
     </g>
     <g transform="matrix(0.666667,0,0,0.55,386.667,210)">
         <g transform="matrix(1,0,0,1.2,0,-120)">
