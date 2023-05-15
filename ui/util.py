@@ -88,6 +88,7 @@ def center_window(win):
     win.geometry(f"+{x}+{y}")
 
 def show_headline(var, url):
+    if not getattr(sys, 'frozen', False): return
     try:
         text = request.urlopen(f"{url}/headline").read().decode("utf-8")
         if text.startswith("NEWS:"):
