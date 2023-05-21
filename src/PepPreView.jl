@@ -1,6 +1,5 @@
 module PepPreView
 
-using Base: Filesystem
 using Sockets
 
 import ArgParse
