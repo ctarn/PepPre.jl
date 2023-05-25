@@ -22,19 +22,18 @@ div.wrapper {
 
 header {
     width: 100%;
-    text-align: center;
+    height: 64px;
     margin: 16px auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 
 main {
     width: 100%;
     min-height: 520px;
     margin: 16px auto;
-}
-
-div.toc {
-    width: 40%;
-    float: right;
 }
 
 footer {
@@ -44,16 +43,13 @@ footer {
     justify-content: space-around;
 }
 
-header {
-    height: 64px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-}
-
 header img {
     height: 100%;
+}
+
+div.toc {
+    width: 40%;
+    float: right;
 }
 
 div.ui {
@@ -97,7 +93,7 @@ pre.citation {
 }
 
 pre.citation::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 </style>
 </head>

@@ -8,9 +8,12 @@ import DataFrames
 import MesMS: MesMS, PepIso
 import MesUtil: pFind
 import ProgressMeter: @showprogress
+import RelocatableFolders: @path
 
 using Dash
 using PlotlyBase
+
+const DIR_DATA = @path joinpath(@__DIR__, "../data/dash")
 
 iw_trace(mz, mz_w, h) = begin
     x1 = mz - mz_w / 2
@@ -97,17 +100,17 @@ tab_psm_names = Dict([
 ])
 
 build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind, V) = begin
-    df_ms2_tb = DataFrames.select(df_ms2, DataFrames.Not(["psm", "ms"]))
-    sort!(df_ms2_tb, :n_psm; rev=true)
-    app = dash()
+    df_ms2_tab = DataFrames.select(df_ms2, DataFrames.Not(["psm", "ms"]))
+    sort!(df_ms2_tab, :n_psm; rev=true)
+    app = dash(; assets_folder=DIR_DATA)
     app.layout = html_div() do
         html_h1("PepPreView", style=Dict("text-align"=>"center")),
         dash_datatable(
             id="tab_ms2",
             style_table=Dict("min-width"=>"100%", "overflow-x"=>"auto"),
             style_cell=Dict("overflow"=>"hidden", "text-overflow"=>"ellipsis", "min-width"=>"64px", "max-width"=>"256px"),
-            columns=[(; name=tab_ms2_names[i], id=i) for i in names(df_ms2_tb) if haskey(tab_ms2_names, i)],
-            data=Dict.(pairs.(eachrow(df_ms2_tb))),
+            columns=[(; name=tab_ms2_names[i], id=i) for i in names(df_ms2_tab) if haskey(tab_ms2_names, i)],
+            data=Dict.(pairs.(eachrow(df_ms2_tab))),
             filter_action="native",
             sort_action="native",
             sort_mode="multi",
@@ -115,27 +118,33 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
             page_action="native",
             page_size=10,
         ),
-        html_div(style=Dict("width"=>"100%", "display"=>"flex", "justify-content"=>"space-between", "align-items"=>"center", "flex-wrap"=>"wrap")) do 
-            html_div(style=Dict("width"=>"320px", "display"=>"flex", "justify-content"=>"space-between", "align-items"=>"center")) do
-                html_label("m/z error (ppm):", style=Dict("margin"=>"6px")),
-                dcc_input(id="error", value=10.0, type="number", placeholder="error")
-            end,
-            html_div(style=Dict("width"=>"320px", "display"=>"flex", "justify-content"=>"space-between", "align-items"=>"center")) do
-                html_label("exclusion threshold:", style=Dict("margin"=>"6px")),
-                dcc_input(id="exclusion", value=1.0, type="number", placeholder="≥0")
-            end,
-            html_div(style=Dict("width"=>"320px", "display"=>"flex", "justify-content"=>"space-between", "align-items"=>"center")) do
-                html_label("score threshold:", style=Dict("margin"=>"6px")),
-                dcc_input(id="score", value=0.0, type="number", placeholder="≥0")
-            end,
-            html_div(style=Dict("width"=>"460px", "display"=>"flex", "justify-content"=>"space-between", "align-items"=>"center")) do
-                html_label("charge state:", style=Dict("margin"=>"6px")),
-                html_div(style=Dict("width"=>"320px")) do
-                    dcc_rangeslider(id="charge", min=1, max=12, step=1, value=[2, 6], marks=map(i -> i=>"$(i)+", 1:12) |> Dict)
+        html_div(className="opts") do
+            html_div(className="opt") do
+                html_span("m/z error:", className="name"),
+                html_div(className="value") do
+                    dcc_input(id="error", className="input", value=10.0, type="number", placeholder="error"),
+                    html_span("ppm", className="unit")
                 end
+            end,
+            html_div(className="opt") do
+                html_span("exclusion threshold:", className="name"),
+                html_div(className="value") do
+                    dcc_input(id="exclusion", className="input", value=1.0, type="number", placeholder="≥0")
+                end
+            end,
+            html_div(className="opt") do
+                html_span("score threshold:", className="name"),
+                html_div(className="value") do
+                    dcc_input(id="score", className="input", value=0.0, type="number", placeholder="≥0")
+                end
+            end,
+            html_div(className="opt") do
+                html_span("charge state:", className="name"),
+                dcc_rangeslider(id="charge", className="charge_slider", min=1, max=12, step=1, value=[2, 6], marks=Dict([i=>"$(i)+" for i in 1:12]))
             end
         end,
-        dcc_graph(id="fig_ion"),
+        # have to set the height manually currently, otherwise the graph can be hidden
+        dcc_graph(id="fig_ion", style=Dict("height"=>"450px")),
         dash_datatable(
             id="tab_psm",
             style_table=Dict("min-width"=>"100%", "overflow-x"=>"auto"),
@@ -148,10 +157,13 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
             page_action="native",
             page_size=10,
         ),
-        html_div(style=Dict("width"=>"100%", "display"=>"flex", "justify-content"=>"space-between", "align-items"=>"center", "flex-wrap"=>"wrap")) do 
-            html_div(style=Dict("width"=>"400px", "display"=>"flex", "justify-content"=>"space-between", "align-items"=>"center")) do
-                html_label("fragment m/z error (ppm):", style=Dict("margin"=>"6px")),
-                dcc_input(id="error_frag", value=20.0, type="number", placeholder="error")
+        html_div(className="opts") do
+            html_div(className="opt") do
+                html_span("fragment m/z error:", className="name"),
+                html_div(className="value") do
+                    dcc_input(id="error_frag", className="input", value=10.0, type="number", placeholder="error"),
+                    html_span("ppm", className="unit")
+                end
             end
         end,
         dcc_graph(id="fig_seq"),
