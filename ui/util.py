@@ -4,6 +4,8 @@ import os
 import platform
 import subprocess
 import sys
+import tkinter as tk
+from tkinter import ttk, filedialog
 from urllib import request
 
 # OS
@@ -79,8 +81,10 @@ def load_task(path, vars):
         print("task failed to loading from", path)
 
 # UI
-sty_entry = {"sticky": "WE", "pady": 1}
-sty_button = {"sticky": "WE", "padx": 4, "pady": 1}
+sty_label = {"sticky": "W", "padx": 4, "pady": 4}
+sty_entry = {"sticky": "EW", "padx": 0, "pady": 1}
+sty_button = {"sticky": "EW", "padx": 4, "pady": 1}
+sty_unit = {"sticky": "EW", "padx": 0, "pady": 1}
 
 def center_window(win):
     x = int((win.winfo_screenwidth() - win.winfo_width()) / 2)
@@ -95,3 +99,37 @@ def show_headline(var, url):
             var.set(text)
     except:
         pass
+
+def askfile(var, **kwargs):
+    def s():
+        path = filedialog.askopenfilename(**kwargs)
+        if len(path) > 0: var.set(path)
+    return s
+
+def askdir(var, **kwargs):
+    def s():
+        path = filedialog.askdirectory(**kwargs)
+        if len(path) > 0: var.set(path)
+    return s
+
+def init_form(f):
+    ttk.Label(f, width=20 if is_windows else 16).grid(column=0, row=0)
+    ttk.Label(f, width=80 if is_windows else 60).grid(column=1, row=0)
+    ttk.Label(f, width=12 if is_windows else 10).grid(column=2, row=0)
+    return f
+
+def add_entry(form, row, label, entry, ext="", func=None):
+    if isinstance(label, str):
+        label = ttk.Label(form, text=label)
+    label.grid(column=0, row=row, **sty_label)
+    if isinstance(entry, tk.Variable):
+        entry = ttk.Entry(form, textvariable=entry)
+    entry.grid(column=1, row=row, **sty_entry)
+    if isinstance(ext, str):
+        if func is None:
+            ext = ttk.Label(form, text=ext)
+            ext.grid(column=2, row=row, **sty_unit)
+        else:
+            ext = ttk.Button(form, text=ext, command=func)
+            ext.grid(column=2, row=row, **sty_button)
+    return label, entry, ext

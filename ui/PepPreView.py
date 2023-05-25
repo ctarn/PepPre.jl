@@ -40,9 +40,7 @@ vars = {k: v["type"](value=v["value"]) for k, v in vars_spec.items()}
 util.load_task(path_autosave, vars)
 
 row = 0
-ttk.Label(main, width=20 if util.is_windows else 16).grid(column=0, row=row)
-ttk.Label(main, width=80 if util.is_windows else 60).grid(column=1, row=row)
-ttk.Label(main, width=12 if util.is_windows else 10).grid(column=2, row=row)
+util.init_form(main)
 
 def do_select_data():
     filetypes = (("MS2", "*.ms2"), ("All", "*.*"))
@@ -56,36 +54,18 @@ def do_select_data():
     if len(vars["data"].get()) > 0 and len(vars["out"].get()) == 0:
         vars["out"].set(os.path.join(os.path.dirname(files[0]), "out"))
 
-ttk.Label(main, text="MS Data:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["data"]).grid(column=1, row=row, **util.sty_entry)
-ttk.Button(main, text="Select", command=do_select_data).grid(column=2, row=row, **util.sty_button)
+util.add_entry(main, row, "MS Data:", vars["data"], "Select", do_select_data)
 row += 1
 
-def do_select_ipv():
-    path = filedialog.askopenfilename(filetypes=(("IPV", "*.bson"), ("All", "*.*")))
-    if len(path) > 0: vars["ipv"].set(path)
-
-ttk.Label(main, text="IPV:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["ipv"]).grid(column=1, row=row, **util.sty_entry)
-ttk.Button(main, text="Select", command=do_select_ipv).grid(column=2, row=row, **util.sty_button)
+t = (("IPV", "*.bson"), ("All", "*.*"))
+util.add_entry(main, row, "IPV:", vars["ipv"], "Select", util.askfile(vars["ipv"], filetypes=t))
 row += 1
 
-def do_select_psm():
-    path = filedialog.askopenfilename(filetypes=(("pFind Spectra File", "*.spectra"), ("All", "*.*")))
-    if len(path) > 0: vars["psm"].set(path)
-
-ttk.Label(main, text="PSM:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["psm"]).grid(column=1, row=row, **util.sty_entry)
-ttk.Button(main, text="Select", command=do_select_psm).grid(column=2, row=row, **util.sty_button)
+t = (("pFind Spectra File", "*.spectra"), ("All", "*.*"))
+util.add_entry(main, row, "PSM:", vars["psm"], "Select", util.askfile(vars["psm"], filetypes=t))
 row += 1
 
-def do_select_pfind():
-    path = filedialog.askdirectory()
-    if len(path) > 0: vars["out"].set(path)
-
-ttk.Label(main, text="Output Directory:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["out"]).grid(column=1, row=row, **util.sty_entry)
-ttk.Button(main, text="Select", command=do_select_pfind).grid(column=2, row=row, **util.sty_button)
+util.add_entry(main, row, "Output Directory:", vars["out"], "Select", util.askdir(vars["out"]))
 row += 1
 
 def run_peppreview(paths):
@@ -147,37 +127,23 @@ btn_run.grid(column=2, row=0, padx=16, pady=8)
 ttk.Button(frm_btn, text="Stop Task", command=lambda: threading.Thread(target=do_stop).start()).grid(column=3, row=0, padx=16, pady=8)
 row += 1
 
-ttk.Separator(main, orient=tk.HORIZONTAL).grid(column=0, row=row, columnspan=3, sticky="WE")
+ttk.Separator(main, orient=tk.HORIZONTAL).grid(column=0, row=row, columnspan=3, sticky="EW")
 ttk.Label(main, text="Advanced Configuration").grid(column=0, row=row, columnspan=3)
 row += 1
 
-def do_select_peppreview():
-    path = filedialog.askopenfilename()
-    if len(path) > 0: vars["peppreview"].set(path)
-
-ttk.Label(main, text="PepPreView:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["peppreview"]).grid(column=1, row=row, **util.sty_entry)
-ttk.Button(main, text="Select", command=do_select_peppreview).grid(column=2, row=row, **util.sty_button)
+util.add_entry(main, row, "PepPreView:", vars["peppreview"], "Select", util.askfile(vars["peppreview"]))
 row += 1
 
-def do_select_pfind():
-    path = filedialog.askdirectory()
-    if len(path) > 0: vars["cfg"].set(path)
-
-ttk.Label(main, text="pFind Directory:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["cfg"]).grid(column=1, row=row, **util.sty_entry)
-ttk.Button(main, text="Select", command=do_select_pfind).grid(column=2, row=row, **util.sty_button)
+util.add_entry(main, row, "pFind Directory:", vars["cfg"], "Select", util.askdir(vars["cfg"]))
 row += 1
 
-def do_new_port():
+def new_port():
     p = str(random.randint(49152, 65535))
     host = vars["url"].get().split(":")[0]
     vars["url"].set(host + ":" + p)
 
-do_new_port()
-ttk.Label(main, text="URL:").grid(column=0, row=row, sticky="W")
-ttk.Entry(main, textvariable=vars["url"]).grid(column=1, row=row, **util.sty_entry)
-ttk.Button(main, text="New Port", command=do_new_port).grid(column=2, row=row, **util.sty_button)
+new_port()
+util.add_entry(main, row, "URL:", vars["url"], "New Port", new_port)
 row += 1
 
-ttk.Label(main, text=footnote, justify="left").grid(column=0, row=row, columnspan=3, sticky="WE")
+ttk.Label(main, text=footnote, justify="left").grid(column=0, row=row, columnspan=3, sticky="EW")
