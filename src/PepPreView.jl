@@ -246,18 +246,13 @@ end
 peppre_view(paths; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm) = begin
     M1 = map(paths) do path
         raw = splitext(basename(path))[1]
-        path = joinpath(dirname(path), raw * ".ms1")
-        @info "MS1 reading from " * path
-        m1s = MesMS.read_ms1(path)
-        return map(m1s) do m
+        return map(MesMS.read_ms1(splitext(path)[1] * ".ms1")) do m
             (; raw, m.id, rt=m.retention_time, ms=m)
         end
     end
     M2 = map(paths) do path
         raw = splitext(basename(path))[1]
-        @info "MS2 reading from " * path
-        m1s = MesMS.read_ms2(path)
-        return map(m1s) do m
+        return map(MesMS.read_ms2(path)) do m
             (; raw, m.id, m.pre, rt=m.retention_time, mz=m.activation_center, mz_w=m.isolation_width, ms=m)
         end
     end

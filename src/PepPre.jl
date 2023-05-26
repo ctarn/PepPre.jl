@@ -148,13 +148,8 @@ prepare(args) = begin
 end
 
 detect_precursor(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) = begin
-    fname_m2 = splitext(path)[1] * ".ms2"
-    @info "MS2 loading from " * fname_m2
-    M2 = MesMS.read_ms2(fname_m2)
-
-    fname_m1 = splitext(path)[1] * ".ms1"
-    @info "MS1 loading from " * fname_m1
-    M1 = MesMS.read_ms1(fname_m1)
+    M1 = MesMS.read_ms1(splitext(path)[1] * ".ms1")
+    M2 = MesMS.read_ms2(splitext(path)[1] * ".ms2")
     prepend!(M1, [MesMS.MS1(id=typemin(Int)) for i in 1:8])
     append!(M1, [MesMS.MS1(id=typemax(Int)) for i in 1:8])
     @info "MS1 slicing"
@@ -183,11 +178,9 @@ detect_precursor(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) =
         name = basename(splitext(path)[1])
         for fmt in fmts
             ext = fmt ∈ ["csv", "tsv"] ? "precursor.$(fmt)" : fmt
-            path_out = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
-            mkpath(dirname(path_out))
-            @info "result saving to " * path_out
-            open(io -> write_ions(fmt, io, M2, I_; name), path_out * "~"; write=true)
-            mv(path_out * "~", path_out; force=true)
+            p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
+            mkpath(dirname(p))
+            MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2, I_; name), p), p)
         end
     end
 end
