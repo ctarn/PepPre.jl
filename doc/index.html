@@ -21,8 +21,8 @@ body, header, main, footer {
 div.header, div.main, div.footer {
     box-sizing: border-box;
     width: 100%;
-    max-width: 800px;
-    min-width: 400px;
+    max-width: 960px;
+    min-width: 320px;
     margin: 0 auto;
     padding: 4px;
 }
@@ -48,21 +48,21 @@ div.footer {
     align-items: center;
 }
 
+div.header a, div.footer a {
+    text-decoration: none;
+}
+
 div.header img {
     height: 100%;
 }
 
-div.toc {
-    width: 300px;
+div.toc, div.ui {
+    width: 320px;
+    max-width: 100%;
     float: right;
 }
 
-div.ui {
-    width: 300px;
-    float: right;
-}
-
-div.ui img {
+div.toc img, div.ui img {
     width: 100%;
 }
 
@@ -70,7 +70,7 @@ div.release section {
     margin: 16px 0;
 }
 
-div.release section time {
+div.release section > time {
     width: 100px;
     padding: 1px;
     border: dashed thin;
@@ -80,15 +80,11 @@ div.release section time {
     float: right;
 }
 
-div.release section h4 {
+div.release section > h4, div.release section > div {
     margin: 4px 0;
 }
 
-div.release section div {
-    margin: 4px 0;
-}
-
-div.release section ol {
+div.release section > div > ol {
     margin: 0;
 }
 
