@@ -139,8 +139,8 @@ class Task:
         self.btn_run.config(state="normal")
         print(f"{self.name} stopped.")
 
-    def call(self, *cmd):
-        run_cmd(cmd, self.handles, self.skip_rest)
+    def call(self, *cmd, **kwargs):
+        run_cmd(cmd, self.handles, self.skip_rest, **kwargs)
 
     def init_ctrl(self, widget, job):
         self.btn_load = ttk.Button(widget, text="Load Task", command=self.load)
