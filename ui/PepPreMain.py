@@ -1,16 +1,9 @@
 import os
-import threading
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk
 
 import meta
 import util
-
-handles = []
-running = False
-skip_rest = False
-
-path_autosave = os.path.join(meta.homedir, "autosave.task")
 
 footnote = """
 Note:
@@ -50,112 +43,21 @@ vars_spec = {
     "mono": {"type": tk.StringVar, "value": path_mono},
     "msconvert": {"type": tk.StringVar, "value": util.get_content("ProteoWizard", "msconvert")},
 }
-vars = {k: v["type"](value=v["value"]) for k, v in vars_spec.items()}
-util.load_task(path_autosave, vars)
-
-row = 0
-util.init_form(main)
-
-def do_select_data():
-    if util.is_windows: filetypes = (("All", "*.*"),)
-    else: filetypes = (("MS2", "*.ms2"), ("RAW", "*.raw"), ("All", "*.*"))
-    files = filedialog.askopenfilenames(filetypes=filetypes)
-    if len(files) == 0:
-        return None
-    elif len(files) > 1:
-        print("multiple data selected:")
-        for file in files: print(">>", file)
-    vars["data"].set(";".join(files))
-    if len(vars["data"].get()) > 0 and len(vars["out"].get()) == 0:
-        vars["out"].set(os.path.join(os.path.dirname(files[0]), "out"))
-
-util.add_entry(main, row, "Data:", vars["data"], "Select", do_select_data)
-row += 1
-
-t = (("IPV", "*.bson"), ("All", "*.*"))
-util.add_entry(main, row, "IPV:", vars["ipv"], "Select", util.askfile(vars["ipv"], filetypes=t))
-row += 1
-
-util.add_entry(main, row, "Isolation Width:", vars["width"], "Th")
-row += 1
-
-_, f, _ = util.add_entry(main, row, "Charge Range:", ttk.Frame(main))
-ttk.Entry(f, textvariable=vars["charge_min"]).pack(side="left", fill="x", expand=True)
-ttk.Label(f, text="-").pack(side="left")
-ttk.Entry(f, textvariable=vars["charge_max"]).pack(side="left", fill="x", expand=True)
-row += 1
-
-util.add_entry(main, row, "Mass Error:", vars["error"], "ppm")
-row += 1
-
-util.add_entry(main, row, "Exclusion Threshold:", vars["exclusion"])
-row += 1
-
-util.add_entry(main, row, "Precuror Number:", vars["fold"], "fold")
-row += 1
-
-_, f, _ =  util.add_entry(main, row, "Oringinal Precursor:", ttk.Frame(main))
-ttk.Checkbutton(f, text="Preserve", variable=vars["inst"]).pack(side="left", expand=True)
-row += 1
-
-_, f, _ = util.add_entry(main, row, "Output Format", ttk.Frame(main))
-for x in fmts: ttk.Checkbutton(f, text=x.upper(), variable=vars[f"fmt_{x}"]).pack(side="left", expand=True)
-row += 1
-
-util.add_entry(main, row, "Output Directory:", vars["out"], "Select", util.askdir(vars["out"]))
-row += 1
+task = util.Task("PepPre", vars_spec, path=meta.homedir)
+V = task.vars
 
 def run_thermorawread(data, out):
-    cmd = [vars["thermorawread"].get(), data, out]
-    if not util.is_windows:
-        cmd = [vars["mono"].get()] + cmd
-    util.run_cmd(cmd, handles, skip_rest)
+    task.call(*([] if util.is_windows else [V["mono"].get()]), V["thermorawread"].get(), data, out)
     return os.path.join(out, os.path.splitext(os.path.basename(data))[0] + ".ms2")
 
 def run_msconvert(data, out):
-    cmd = [vars["msconvert"].get(), "--ms1", "--filter", "peakPicking true", "-o", out, data]
-    util.run_cmd(cmd, handles, skip_rest)
-    cmd = [vars["msconvert"].get(), "--ms2", "--filter", "peakPicking true", "-o", out, data]
-    util.run_cmd(cmd, handles, skip_rest)
+    task.call(V["msconvert"].get(), "--ms1", "--filter", "peakPicking true", "-o", out, data)
+    task.call(V["msconvert"].get(), "--ms2", "--filter", "peakPicking true", "-o", out, data)
     return os.path.join(out, os.path.splitext(os.path.basename(data))[0] + ".ms2")
 
-def run_peppre(paths):
-    cmd = [
-        vars["peppre"].get(),
-        *(["--inst"] if vars["inst"].get() else []),
-        "--ipv", vars["ipv"].get(),
-        "--width", vars["width"].get(),
-        "--charge", vars["charge_min"].get() + ":" + vars["charge_max"].get(),
-        "--error", vars["error"].get(),
-        "--thres", vars["exclusion"].get(),
-        "--fold", vars["fold"].get(),
-        "--fmt", ",".join(filter(lambda x: vars[f"fmt_{x}"].get(), fmts)),
-        "--out", vars["out"].get(),
-        *paths,
-    ]
-    util.run_cmd(cmd, handles, skip_rest)
-
-def do_load():
-    path = filedialog.askopenfilename(filetypes=(("Configuration", "*.task"), ("All", "*.*")))
-    if len(path) > 0: util.load_task(path, vars)
-
-def do_save():
-    util.save_task(path_autosave, {k: v for k, v in vars.items() if v.get() != vars_spec[k]["value"]})
-    path = vars["out"].get()
-    if len(path) > 0:
-        os.makedirs(path, exist_ok=True)
-        util.save_task(os.path.join(path, "PepPre.task"), vars)
-    else:
-        print("`Output Directory` is required")
-
-def do_run():
-    btn_run.config(state="disabled")
-    global handles, running, skip_rest
-    running = True
-    skip_rest = False
-    do_save()
+def run():
     paths = []
-    for p in vars["data"].get().split(";"):
+    for p in V["data"].get().split(";"):
         ext = os.path.splitext(p)[1].lower()
         if ext == ".ms2":
             pass
@@ -163,53 +65,66 @@ def do_run():
             print("ERROR: select MS2 files instead of MS1 files.")
             break
         elif ext == ".raw":
-            p = run_thermorawread(p, vars["out"].get())
+            p = run_thermorawread(p, V["out"].get())
         elif util.is_windows:
-            p = run_msconvert(p, vars["out"].get())
+            p = run_msconvert(p, V["out"].get())
         else:
             print("WARN: file not supported and skipped, path =", p)
             continue
         paths.append(p)
-    run_peppre(paths)
-    running = False
-    btn_run.config(state="normal")
+    task.call(V["peppre"].get(), *paths, "--out", V["out"].get(),
+        *(["--inst"] if V["inst"].get() else []),
+        "--ipv", V["ipv"].get(),
+        "--width", V["width"].get(),
+        "--charge", V["charge_min"].get() + ":" + V["charge_max"].get(),
+        "--error", V["error"].get(),
+        "--thres", V["exclusion"].get(),
+        "--fold", V["fold"].get(),
+        "--fmt", ",".join(filter(lambda x: V[f"fmt_{x}"].get(), fmts)),
+    )
 
-def do_stop():
-    global handles, running, skip_rest
-    skip_rest = True
-    for job in handles:
-        if job.poll() is None:
-            job.terminate()
-    running = False
-    handles.clear()
-    btn_run.config(state="normal")
-    print("PepPre stopped.")
-
-frm_btn = ttk.Frame(main)
-frm_btn.grid(column=0, row=row, columnspan=3)
-ttk.Button(frm_btn, text="Load Task", command=do_load).grid(column=0, row=0, padx=16, pady=8)
-ttk.Button(frm_btn, text="Save Task", command=do_save).grid(column=1, row=0, padx=16, pady=8)
-btn_run = ttk.Button(frm_btn, text="Run Task", command=lambda: threading.Thread(target=do_run).start())
-btn_run.grid(column=2, row=0, padx=16, pady=8)
-ttk.Button(frm_btn, text="Stop Task", command=lambda: threading.Thread(target=do_stop).start()).grid(column=3, row=0, padx=16, pady=8)
-row += 1
-
-ttk.Separator(main, orient=tk.HORIZONTAL).grid(column=0, row=row, columnspan=3, sticky="EW")
-ttk.Label(main, text="Advanced Configuration").grid(column=0, row=row, columnspan=3)
-row += 1
-
-util.add_entry(main, row, "PepPre:", vars["peppre"], "Select", util.askfile(vars["peppre"]))
-row += 1
-
-util.add_entry(main, row, "ThermoRawRead:", vars["thermorawread"], "Select", util.askfile(vars["thermorawread"]))
-row += 1
-
+util.init_form(main)
+I = 0
+t = (("MS2", "*.ms2"), ("RAW", "*.raw"), ("All", "*.*"))
+util.add_entry(main, I, "Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
+I += 1
+t = (("IPV", "*.bson"), ("All", "*.*"))
+util.add_entry(main, I, "IPV:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
+I += 1
+util.add_entry(main, I, "Isolation Width:", V["width"], "Th")
+I += 1
+_, f, _ = util.add_entry(main, I, "Charge Range:", ttk.Frame(main))
+ttk.Entry(f, textvariable=V["charge_min"]).pack(side="left", fill="x", expand=True)
+ttk.Label(f, text="-").pack(side="left")
+ttk.Entry(f, textvariable=V["charge_max"]).pack(side="left", fill="x", expand=True)
+I += 1
+util.add_entry(main, I, "Mass Error:", V["error"], "ppm")
+I += 1
+util.add_entry(main, I, "Exclusion Threshold:", V["exclusion"])
+I += 1
+util.add_entry(main, I, "Precuror Number:", V["fold"], "fold")
+I += 1
+_, f, _ =  util.add_entry(main, I, "Oringinal Precursor:", ttk.Frame(main))
+ttk.Checkbutton(f, text="Preserve", variable=V["inst"]).pack(side="left", expand=True)
+I += 1
+_, f, _ = util.add_entry(main, I, "Output Format", ttk.Frame(main))
+for x in fmts: ttk.Checkbutton(f, text=x.upper(), variable=V[f"fmt_{x}"]).pack(side="left", expand=True)
+I += 1
+util.add_entry(main, I, "Output Directory:", V["out"], "Select", util.askdir(V["out"]))
+I += 1
+task.init_ctrl(ttk.Frame(main), run).grid(column=0, row=I, columnspan=3)
+I += 1
+ttk.Separator(main, orient=tk.HORIZONTAL).grid(column=0, row=I, columnspan=3, sticky="EW")
+ttk.Label(main, text="Advanced Configuration").grid(column=0, row=I, columnspan=3)
+I += 1
+util.add_entry(main, I, "PepPre:", V["peppre"], "Select", util.askfile(V["peppre"]))
+I += 1
+util.add_entry(main, I, "ThermoRawRead:", V["thermorawread"], "Select", util.askfile(V["thermorawread"]))
+I += 1
 if not util.is_windows:
-    util.add_entry(main, row, "Mono Runtime:", vars["mono"], "Select", util.askfile(vars["mono"]))
-    row += 1
-
+    util.add_entry(main, I, "Mono Runtime:", V["mono"], "Select", util.askfile(V["mono"]))
+    I += 1
 if util.is_windows:
-    util.add_entry(main, row, "MsConvert:", vars["msconvert"], "Select", util.askfile(vars["msconvert"]))
-    row += 1
-
-ttk.Label(main, text=footnote, justify="left").grid(column=0, row=row, columnspan=3, sticky="EW")
+    util.add_entry(main, I, "MsConvert:", V["msconvert"], "Select", util.askfile(V["msconvert"]))
+    I += 1
+ttk.Label(main, text=footnote, justify="left").grid(column=0, row=I, columnspan=3, sticky="EW")
