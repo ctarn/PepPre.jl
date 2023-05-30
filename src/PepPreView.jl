@@ -304,7 +304,7 @@ main() = begin
         "--ipv"
             help = "IPV file"
             metavar = "IPV"
-            default = joinpath(homedir(), ".MesMS/IPV.bson")
+            default = joinpath(homedir(), ".MesMS/peptide.ipv")
         "--cfg"
             help = "pFind config directory"
             default = ""

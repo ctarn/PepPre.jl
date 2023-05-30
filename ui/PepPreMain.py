@@ -25,7 +25,7 @@ else:
 fmts = ["csv", "tsv", "ms2", "mgf"]
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
-    "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "IPV.bson")},
+    "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "peptide.ipv")},
     "width": {"type": tk.StringVar, "value": "2.0"},
     "charge_min": {"type": tk.StringVar, "value": "2"},
     "charge_max": {"type": tk.StringVar, "value": "6"},
@@ -88,7 +88,7 @@ I = 0
 t = (("MS2", "*.ms2"), ("RAW", "*.raw"), ("All", "*.*"))
 util.add_entry(main, I, "Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
 I += 1
-t = (("IPV", "*.bson"), ("All", "*.*"))
+t = (("IPV", "*.ipv"), ("All", "*.*"))
 util.add_entry(main, I, "IPV:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
 I += 1
 util.add_entry(main, I, "Isolation Width:", V["width"], "Th")

@@ -22,7 +22,7 @@ main.pack(fill="both")
 
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
-    "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "IPV.bson")},
+    "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "peptide.ipv")},
     "psm": {"type": tk.StringVar, "value": ""},
     "out": {"type": tk.StringVar, "value": ""},
     "peppreview": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreView")},
@@ -53,7 +53,7 @@ I = 0
 t = (("MS2", "*.ms2"), ("All", "*.*"))
 util.add_entry(main, I, "MS Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
 I += 1
-t = (("IPV", "*.bson"), ("All", "*.*"))
+t = (("IPV", "*.ipv"), ("All", "*.*"))
 util.add_entry(main, I, "IPV:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
 I += 1
 t = (("pFind Spectra File", "*.spectra"), ("All", "*.*"))
