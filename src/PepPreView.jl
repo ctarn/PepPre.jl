@@ -212,10 +212,6 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         ε = ε * 1.0e-6
         ms2 = df_ms2[di_ms2[(r.file, r.scan)], :]
         ions = MesMS.Plot.build_ions(ms2.ms.peaks, r.pep, r.mod, ε, ele_pfind, aa_pfind, mod_pfind)
-        ions = map(ions) do ion
-            a, b, c = match(r"\$(.+)_\{(.+)\}\^\{(.+)\}\$", ion.text).captures
-            return (; ion..., text="$(a)($(b))$(c)")
-        end
         fig_seq = MesMS.Plotly.seq(r.pep, r.mod, ions)
         fig_psm = MesMS.Plotly.spec(ms2.ms.peaks, filter(i -> i.peak > 0, ions))
         cfg_seq = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_seq_$(r.file)_$(r.scan)_$(r.id)").fields)
