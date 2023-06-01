@@ -74,7 +74,7 @@ plot_peppre(ps, mz, mz_w, ions, df_psm, ε, V) = begin
 end
 
 tab_ms2_names = Dict([
-    "raw" => "RAW",
+    "file" => "File",
     "id" => "Scan No.",
     "pre" => "Master Scan No.",
     "rt" => "Retention Time (s)",
@@ -93,7 +93,7 @@ tab_psm_names = Dict([
     "prot" => "Protein",
     "error" => "Precursor Mass Error (ppm)",
     "title" => "Spectrum Title",
-    "raw" => "RAW",
+    "file" => "File",
     "scan" => "Scan No.",
     "q_value" => "q-value",
     "score" => "PSM Score",
@@ -182,8 +182,8 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         Input("charge", "value"),
     ) do v1, v2, ε, τ, s, zs
         r = v1[v2[begin] + 1]
-        ms2 = df_ms2[di_ms2[(r.raw, r.id)], :]
-        ms1 = df_ms1[di_ms1[(ms2.raw, ms2.pre)], :]
+        ms2 = df_ms2[di_ms2[(r.file, r.id)], :]
+        ms1 = df_ms1[di_ms1[(ms2.file, ms2.pre)], :]
         ε = ε * 1.0e-6
         zs = range(zs[1], zs[2])
         ps = MesMS.query(ms1.ms.peaks, ms2.mz - ms2.mz_w / 2 * 2 - 2, ms2.mz + ms2.mz_w / 2 * 2)
@@ -194,7 +194,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         for i in table_data
             i[:mod] = pFind.modstr(i[:mod])
         end
-        cfg = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_$(r.raw)_$(r.id)").fields)
+        cfg = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_$(r.file)_$(r.id)").fields)
         return table_data, fig, cfg
     end
 
@@ -210,7 +210,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         r = v1[v2[begin] + 1]
         r = df_psm[r.id, :]
         ε = ε * 1.0e-6
-        ms2 = df_ms2[di_ms2[(r.raw, r.scan)], :]
+        ms2 = df_ms2[di_ms2[(r.file, r.scan)], :]
         ions = MesMS.Plot.build_ions(ms2.ms.peaks, r.pep, r.mod, ε, ele_pfind, aa_pfind, mod_pfind)
         ions = map(ions) do ion
             a, b, c = match(r"\$(.+)_\{(.+)\}\^\{(.+)\}\$", ion.text).captures
@@ -218,8 +218,8 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         end
         fig_seq = MesMS.Plotly.seq(r.pep, r.mod, ions)
         fig_psm = MesMS.Plotly.spec(ms2.ms.peaks, filter(i -> i.peak > 0, ions))
-        cfg_seq = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_seq_$(r.raw)_$(r.scan)_$(r.id)").fields)
-        cfg_psm = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_psm_$(r.raw)_$(r.scan)_$(r.id)").fields)
+        cfg_seq = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_seq_$(r.file)_$(r.scan)_$(r.id)").fields)
+        cfg_psm = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_psm_$(r.file)_$(r.scan)_$(r.id)").fields)
         return fig_seq, cfg_seq, fig_psm, cfg_psm
     end
     return app
@@ -245,25 +245,25 @@ end
 
 peppre_view(paths; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm) = begin
     M1 = map(paths) do path
-        raw = splitext(basename(path))[1]
+        file = splitext(basename(path))[1]
         return map(MesMS.read_ms1(splitext(path)[1] * ".ms1")) do m
-            (; raw, m.id, rt=m.retention_time, ms=m)
+            (; file, m.id, rt=m.retention_time, ms=m)
         end
     end
     M2 = map(paths) do path
-        raw = splitext(basename(path))[1]
+        file = splitext(basename(path))[1]
         return map(MesMS.read_ms2(path)) do m
-            (; raw, m.id, m.pre, rt=m.retention_time, mz=m.activation_center, mz_w=m.isolation_width, ms=m)
+            (; file, m.id, m.pre, rt=m.retention_time, mz=m.activation_center, mz_w=m.isolation_width, ms=m)
         end
     end
     df_ms1 = reduce(vcat, M1) |> DataFrames.DataFrame
     df_ms2 = reduce(vcat, M2) |> DataFrames.DataFrame
 
-    sort!(df_ms1, [:raw, :id])
-    sort!(df_ms2, [:raw, :id])
+    sort!(df_ms1, [:file, :id])
+    sort!(df_ms2, [:file, :id])
 
-    di_ms1 = [(r.raw, r.id) => i for (i, r) in enumerate(eachrow(df_ms1))] |> Dict
-    di_ms2 = [(r.raw, r.id) => i for (i, r) in enumerate(eachrow(df_ms2))] |> Dict
+    di_ms1 = [(r.file, r.id) => i for (i, r) in enumerate(eachrow(df_ms1))] |> Dict
+    di_ms2 = [(r.file, r.id) => i for (i, r) in enumerate(eachrow(df_ms2))] |> Dict
 
     df_psm = pFind.read_psm(path_psm)
     ns = [
@@ -272,15 +272,15 @@ peppre_view(paths; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm) = be
     ]
     DataFrames.select!(df_psm, DataFrames.Not(filter(x -> x ∈ names(df_psm), ns)))
     ns = [
-        "mh", "mz", "z", "pep", "mod", "prot", "error", "title", "raw", "scan", "idx_pre",
+        "mh", "mz", "z", "pep", "mod", "prot", "error", "title", "file", "scan", "idx_pre",
     ]
     DataFrames.select!(df_psm, ns, DataFrames.Not(ns))
 
     df_psm.id = 1:size(df_psm, 1)
     DataFrames.select!(df_psm, :id, DataFrames.Not([:id]))
-    df_psm.rt = [df_ms2[di_ms2[(r.raw, r.scan)], :rt] for r in eachrow(df_psm)]
+    df_psm.rt = [df_ms2[di_ms2[(r.file, r.scan)], :rt] for r in eachrow(df_psm)]
 
-    df_ms2.psm = [df_psm[(df_psm.scan .== r.id) .&& (df_psm.raw .== r.raw), :id] for r in eachrow(df_ms2)]
+    df_ms2.psm = [df_psm[(df_psm.scan .== r.id) .&& (df_psm.file .== r.file), :id] for r in eachrow(df_ms2)]
     df_ms2.n_psm = length.(df_ms2.psm)
     @async begin
         sleep(4)
