@@ -148,8 +148,8 @@ prepare(args) = begin
 end
 
 detect_precursor(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) = begin
-    M1 = MesMS.read_ms1(splitext(path)[1] * ".ms1")
-    M2 = MesMS.read_ms2(splitext(path)[1] * ".ms2")
+    M = MesMS.read_ms(path)
+    M1, M2 = M.MS1, M.MS2
     prepend!(M1, [MesMS.MS1(id=typemin(Int)) for i in 1:8])
     append!(M1, [MesMS.MS1(id=typemax(Int)) for i in 1:8])
     @info "MS1 slicing"
@@ -228,16 +228,15 @@ main() = begin
             metavar = "output"
             default = "./out/"
         "data"
-            help = "list of .ms2 files or directories; .ms1 files should be in the same directory"
+            help = "list of .mes or .ms1/2 files; .ms2/1 files should be in the same directory for .ms1/2"
             nargs = '+'
             required = true
     end
     args = ArgParse.parse_args(settings)
-    paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".ms2"); init=String[])
+    paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".mes"); init=String[])
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
-    sess = prepare(args)
-    detect_precursor.(paths; sess...)
+    detect_precursor.(paths; prepare(args)...)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__

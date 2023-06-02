@@ -240,20 +240,13 @@ prepare(args) = begin
 end
 
 peppre_view(paths; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm) = begin
-    M1 = map(paths) do path
-        file = splitext(basename(path))[1]
-        return map(MesMS.read_ms1(splitext(path)[1] * ".ms1")) do m
-            (; file, m.id, rt=m.retention_time, ms=m)
-        end
-    end
-    M2 = map(paths) do path
-        file = splitext(basename(path))[1]
-        return map(MesMS.read_ms2(path)) do m
-            (; file, m.id, m.pre, rt=m.retention_time, mz=m.activation_center, mz_w=m.isolation_width, ms=m)
-        end
-    end
-    df_ms1 = reduce(vcat, M1) |> DataFrames.DataFrame
-    df_ms2 = reduce(vcat, M2) |> DataFrames.DataFrame
+    Ms = map(MesMS.read_ms, paths)
+    df_ms1 = map(reduce(vcat, getfield.(Ms, :MS1))) do m
+        (; file, m.id, rt=m.retention_time, ms=m)
+    end |> DataFrames.DataFrame
+    df_ms2 = map(reduce(vcat, getfield.(Ms, :MS2))) do m
+        (; file, m.id, m.pre, rt=m.retention_time, mz=m.activation_center, mz_w=m.isolation_width, ms=m)
+    end |> DataFrames.DataFrame
 
     sort!(df_ms1, [:file, :id])
     sort!(df_ms2, [:file, :id])
@@ -316,8 +309,7 @@ main() = begin
     paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".ms2"); init=String[])
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
-    sess = prepare(args)
-    peppre_view(paths; sess...)
+    peppre_view(paths; prepare(args)...)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
