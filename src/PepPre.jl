@@ -147,7 +147,7 @@ prepare(args) = begin
     return (; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out)
 end
 
-detect_precursor(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) = begin
+process(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) = begin
     M = MesMS.read_ms(path)
     M1, M2 = M.MS1, M.MS2
     prepend!(M1, [MesMS.MS1(id=typemin(Int)) for i in 1:8])
@@ -236,7 +236,7 @@ main() = begin
     paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".mes"); init=String[])
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
-    detect_precursor.(paths; prepare(args)...)
+    process.(paths; prepare(args)...)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__

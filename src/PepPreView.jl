@@ -239,7 +239,7 @@ prepare(args) = begin
     return (; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm)
 end
 
-peppre_view(paths; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm) = begin
+process(paths; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm) = begin
     Ms = map(MesMS.read_ms, paths)
     df_ms1 = map(reduce(vcat, getfield.(Ms, :MS1))) do m
         (; file, m.id, rt=m.retention_time, ms=m)
@@ -301,7 +301,7 @@ main() = begin
             help = "pFind PSM path"
             required = true
         "data"
-            help = "list of .ms2 files; .ms1 files should be in the same directory"
+            help = "list of .mes or .ms1/2 files; .ms2/1 files should be in the same directory for .ms1/2"
             nargs = '+'
             required = true
     end
@@ -309,7 +309,7 @@ main() = begin
     paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".ms2"); init=String[])
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
-    peppre_view(paths; prepare(args)...)
+    process(paths; prepare(args)...)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
