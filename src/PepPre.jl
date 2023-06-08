@@ -73,7 +73,7 @@ evaluate(ms1, mz, r, zs, ε, V, τ, mode) = begin
     ions = map(ms1) do spec
         peaks = MesMS.query(spec, mz - r - 2, mz + r + 1)
         ions = [MesMS.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
-        ions = filter(i -> i.m < length(V) && PepIso.prefilter(i, spec, ε, V, mode), ions)
+        ions = filter(i -> i.mz * i.z < MesMS.ipv_max(V) && PepIso.prefilter(i, spec, ε, V, mode), ions)
         ions = PepIso.deisotope(ions, spec, τ, ε, V)
         inten = sum(p -> p.inten, MesMS.query(peaks, mz - r, mz + r), init=1.0e-16)
         ions = map(ions) do ion
