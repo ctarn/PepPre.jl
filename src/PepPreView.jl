@@ -222,8 +222,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
 end
 
 prepare(args) = begin
-    host = parse(IPAddr, args["host"])
-    port = parse(Int, args["port"])
+    path_psm = args["psm"]
     V = MesMS.build_ipv(args["ipv"])
     path_cfg = args["cfg"]
     if isempty(path_cfg)
@@ -235,11 +234,12 @@ prepare(args) = begin
         aa_pfind = map(x -> MesMS.mass(x, ele_pfind), pFind.read_amino_acid(joinpath(path_cfg, "aa.ini")) |> NamedTuple)
         mod_pfind = MesMS.mapvalue(x -> x.mass, pFind.read_mod(joinpath(path_cfg, "modification.ini")))
     end
-    path_psm = args["psm"]
-    return (; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm)
+    host = parse(IPAddr, args["host"])
+    port = parse(Int, args["port"])
+    return (; path_psm, V, ele_pfind, aa_pfind, mod_pfind, host, port)
 end
 
-process(paths; host, port, V, ele_pfind, aa_pfind, mod_pfind, path_psm) = begin
+process(paths; path_psm, V, ele_pfind, aa_pfind, mod_pfind, host, port) = begin
     Ms = MesMS.read_ms.(paths)
     names = paths .|> basename .|> splitext .|> first
     df_ms1 = map(zip(names, Ms)) do (file, M)
@@ -285,6 +285,20 @@ end
 main() = begin
     settings = ArgParse.ArgParseSettings(prog="PepPreView")
     ArgParse.@add_arg_table! settings begin
+        "data"
+            help = "list of .mes or .ms1/2 files; .ms2/1 files should be in the same directory for .ms1/2"
+            nargs = '+'
+            required = true
+        "--psm"
+            help = "pFind PSM path"
+            required = true
+        "--ipv"
+            help = "IPV file"
+            metavar = "IPV"
+            default = joinpath(homedir(), ".MesMS/peptide.ipv")
+        "--cfg"
+            help = "pFind config directory"
+            default = ""
         "--host"
             help = "hostname"
             metavar = "hostname"
@@ -293,23 +307,9 @@ main() = begin
             help = "port"
             metavar = "port"
             default = "30030"
-        "--ipv"
-            help = "IPV file"
-            metavar = "IPV"
-            default = joinpath(homedir(), ".MesMS/peptide.ipv")
-        "--cfg"
-            help = "pFind config directory"
-            default = ""
-        "--psm"
-            help = "pFind PSM path"
-            required = true
-        "data"
-            help = "list of .mes or .ms1/2 files; .ms2/1 files should be in the same directory for .ms1/2"
-            nargs = '+'
-            required = true
     end
     args = ArgParse.parse_args(settings)
-    paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".ms2"); init=String[])
+    paths = reduce(vcat, MesMS.match_path.(args["data"], ".mes")) |> unique |> sort
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
     process(paths; prepare(args)...)

@@ -3,8 +3,7 @@ module PepPre
 using Printf
 
 import ArgParse
-import MesMS
-import MesMS: PepIso
+import MesMS: MesMS, PepIso
 import ProgressMeter: @showprogress
 
 merge_ions(ions, ε) = begin
@@ -129,25 +128,25 @@ write_ions(fmt, io, M, I; name="filename") = begin
 end
 
 prepare(args) = begin
-    inst = args["inst"]::Bool
+    out = mkpath(args["out"])
+    V = MesMS.build_ipv(args["ipv"])
     mode = Symbol(args["mode"])
     if mode ∉ [:mono, :max]
         @warn "unknown mode, replaced with `mono`: $(mode)"
         mode = :mono
     end
-    V = MesMS.build_ipv(args["ipv"])
     r = args["width"] == "auto" ? NaN : parse(Float64, args["width"]) / 2
     zs = Vector{Int}(MesMS.parse_range(Int, args["charge"]))
     ε = parse(Float64, args["error"]) * 1.0e-6
     τ = parse(Float64, args["thres"])
     folds = Vector{Float64}(MesMS.parse_range(Float64, args["fold"]))
+    inst = args["inst"]::Bool
     fmts = split(args["fmt"], ",")
     subdir = ':' ∈ args["fold"]
-    out = args["out"]
-    return (; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out)
+    return (; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir)
 end
 
-process(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) = begin
+process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir) = begin
     M = MesMS.read_ms(path)
     M1, M2 = M.MS1, M.MS2
     prepend!(M1, [MesMS.MS1(id=typemin(Int)) for i in 1:8])
@@ -179,7 +178,6 @@ process(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) = begin
         for fmt in fmts
             ext = fmt ∈ ["csv", "tsv"] ? "precursor.$(fmt)" : fmt
             p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
-            mkpath(dirname(p))
             MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2, I_; name), p), p)
         end
     end
@@ -188,17 +186,22 @@ end
 main() = begin
     settings = ArgParse.ArgParseSettings(prog="PepPre")
     ArgParse.@add_arg_table! settings begin
-        "--inst"
-            help = "preserve original (instrument) ions"
-            action = :store_true
+        "data"
+            help = "list of .mes or .ms1/2 files; .ms2/1 files should be in the same directory for .ms1/2"
+            nargs = '+'
+            required = true
+        "--out", "-o"
+            help = "output directory"
+            metavar = "output"
+            default = "./out/"
+        "--ipv"
+            help = "Isotope Pattern Vector file"
+            metavar = "IPV"
+            default = joinpath(homedir(), ".MesMS/peptide.ipv")
         "--mode"
             help = "by mono or max mode"
             metavar = "mono|max"
             default = "mono"
-        "--ipv"
-            help = "IPV file"
-            metavar = "IPV"
-            default = joinpath(homedir(), ".MesMS/peptide.ipv")
         "--width", "-w"
             help = "isolation width"
             metavar = "Th"
@@ -219,21 +222,16 @@ main() = begin
             help = "number of precursor ions"
             metavar = "fold"
             default = "4.0"
+        "--inst"
+            help = "preserve original (instrument) ions"
+            action = :store_true
         "--fmt", "-f"
             help = "output format"
             metavar = "csv,tsv,ms2,mgf"
-            default = "ms2"
-        "--out", "-o"
-            help = "output directory"
-            metavar = "output"
-            default = "./out/"
-        "data"
-            help = "list of .mes or .ms1/2 files; .ms2/1 files should be in the same directory for .ms1/2"
-            nargs = '+'
-            required = true
+            default = "csv"
     end
     args = ArgParse.parse_args(settings)
-    paths = (sort∘unique∘reduce)(vcat, MesMS.match_path.(args["data"], ".mes"); init=String[])
+    paths = reduce(vcat, MesMS.match_path.(args["data"], ".mes")) |> unique |> sort
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
     process.(paths; prepare(args)...)

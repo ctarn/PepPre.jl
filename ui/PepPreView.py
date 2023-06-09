@@ -22,9 +22,9 @@ main.pack(fill="both")
 
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
-    "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "peptide.ipv")},
-    "psm": {"type": tk.StringVar, "value": ""},
     "out": {"type": tk.StringVar, "value": ""},
+    "psm": {"type": tk.StringVar, "value": ""},
+    "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "peptide.ipv")},
     "peppreview": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreView")},
     "cfg": {"type": tk.StringVar, "value": ""},
     "url": {"type": tk.StringVar, "value": "127.0.0.1:30030"},
@@ -34,8 +34,8 @@ V = task.vars
 
 def run():
     task.call(V["peppreview"].get(), *(V["data"].get().split(";")),
-        "--ipv", V["ipv"].get(),
         "--psm", V["psm"].get(),
+        "--ipv", V["ipv"].get(),
         "--cfg", V["cfg"].get(),
         "--host", V["url"].get().split(":")[0],
         "--port", V["url"].get().split(":")[1],
@@ -50,14 +50,14 @@ new_port()
 
 util.init_form(main)
 I = 0
-t = (("MS2", "*.ms2"), ("All", "*.*"))
+t = (("MES", "*.mes"), ("MS2", "*.ms2"), ("All", "*.*"))
 util.add_entry(main, I, "MS Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
-I += 1
-t = (("IPV", "*.ipv"), ("All", "*.*"))
-util.add_entry(main, I, "IPV:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
 I += 1
 t = (("pFind Spectra File", "*.spectra"), ("All", "*.*"))
 util.add_entry(main, I, "PSM:", V["psm"], "Select", util.askfile(V["psm"], filetypes=t))
+I += 1
+t = (("IPV", "*.ipv"), ("All", "*.*"))
+util.add_entry(main, I, "Isotope Pattern:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
 I += 1
 util.add_entry(main, I, "Output Directory:", V["out"], "Select", util.askdir(V["out"]))
 I += 1

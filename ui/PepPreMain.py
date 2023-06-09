@@ -25,6 +25,7 @@ else:
 fmts = ["csv", "tsv", "ms2", "mgf"]
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
+    "out": {"type": tk.StringVar, "value": ""},
     "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "peptide.ipv")},
     "width": {"type": tk.StringVar, "value": "2.0"},
     "charge_min": {"type": tk.StringVar, "value": "2"},
@@ -37,7 +38,6 @@ vars_spec = {
     "fmt_tsv": {"type": tk.IntVar, "value": 0},
     "fmt_ms2": {"type": tk.IntVar, "value": 0},
     "fmt_mgf": {"type": tk.IntVar, "value": 0},
-    "out": {"type": tk.StringVar, "value": ""},
     "peppre": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPre")},
     "thermorawread": {"type": tk.StringVar, "value": util.get_content("ThermoRawRead", "ThermoRawRead.exe", shared=True)},
     "mono": {"type": tk.StringVar, "value": path_mono},
@@ -73,23 +73,23 @@ def run():
             continue
         paths.append(p)
     task.call(V["peppre"].get(), *paths, "--out", V["out"].get(),
-        *(["--inst"] if V["inst"].get() else []),
         "--ipv", V["ipv"].get(),
         "--width", V["width"].get(),
         "--charge", V["charge_min"].get() + ":" + V["charge_max"].get(),
         "--error", V["error"].get(),
         "--thres", V["exclusion"].get(),
         "--fold", V["fold"].get(),
+        *(["--inst"] if V["inst"].get() else []),
         "--fmt", ",".join(filter(lambda x: V[f"fmt_{x}"].get(), fmts)),
     )
 
 util.init_form(main)
 I = 0
-t = (("MS2", "*.ms2"), ("RAW", "*.raw"), ("All", "*.*"))
-util.add_entry(main, I, "Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
+t = (("MES", "*.mes"), ("MS2", "*.ms2"), ("RAW", "*.raw"), ("All", "*.*"))
+util.add_entry(main, I, "MS Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
 I += 1
 t = (("IPV", "*.ipv"), ("All", "*.*"))
-util.add_entry(main, I, "IPV:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
+util.add_entry(main, I, "Isotope Pattern:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
 I += 1
 util.add_entry(main, I, "Isolation Width:", V["width"], "Th")
 I += 1
@@ -98,7 +98,7 @@ ttk.Entry(f, textvariable=V["charge_min"]).pack(side="left", fill="x", expand=Tr
 ttk.Label(f, text="-").pack(side="left")
 ttk.Entry(f, textvariable=V["charge_max"]).pack(side="left", fill="x", expand=True)
 I += 1
-util.add_entry(main, I, "Mass Error:", V["error"], "ppm")
+util.add_entry(main, I, "Max. Mass Error:", V["error"], "ppm")
 I += 1
 util.add_entry(main, I, "Exclusion Threshold:", V["exclusion"])
 I += 1
