@@ -102,7 +102,7 @@ util.add_entry(main, I, "Max. Mass Error:", V["error"], "ppm")
 I += 1
 util.add_entry(main, I, "Exclusion Threshold:", V["exclusion"])
 I += 1
-util.add_entry(main, I, "Precuror Number:", V["fold"], "fold")
+util.add_entry(main, I, "Precursor Number:", V["fold"], "fold")
 I += 1
 _, f, _ =  util.add_entry(main, I, "Oringinal Precursor:", ttk.Frame(main))
 ttk.Checkbutton(f, text="Preserve", variable=V["inst"]).pack(side="left", expand=True)
