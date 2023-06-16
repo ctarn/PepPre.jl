@@ -110,7 +110,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
             style_table=Dict("min-width"=>"100%", "overflow-x"=>"auto"),
             style_cell=Dict("overflow"=>"hidden", "text-overflow"=>"ellipsis", "min-width"=>"64px", "max-width"=>"256px"),
             columns=[(; name=tab_ms2_names[i], id=i) for i in names(df_ms2_tab) if haskey(tab_ms2_names, i)],
-            data=Dict.(pairs.(eachrow(df_ms2_tab))),
+            data=Dict.(pairs.(eachrow(string.(df_ms2_tab)))),
             filter_action="native",
             sort_action="native",
             sort_mode="multi",
@@ -190,7 +190,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         ions = run_peppre(ps, ms2.mz, ms2.mz_w / 2, zs, ε, V, τ)
         filter!(i -> i.score ≥ s, ions)
         fig = plot_peppre(ps, ms2.mz, ms2.mz_w, ions, df_psm[ms2.psm, :], ε, V)
-        table_data = Dict.(pairs.(eachrow(df_psm[ms2.psm, :])))
+        table_data = Dict.(pairs.(eachrow(string.(df_psm[ms2.psm, :]))))
         for i in table_data
             i[:mod] = pFind.modstr(i[:mod])
         end
