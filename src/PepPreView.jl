@@ -182,7 +182,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         Input("charge", "value"),
     ) do v1, v2, ε, τ, s, zs
         r = v1[v2[begin] + 1]
-        ms2 = df_ms2[di_ms2[(r.file, r.id)], :]
+        ms2 = df_ms2[di_ms2[(r.file, parse(Int, r.id))], :]
         ms1 = df_ms1[di_ms1[(ms2.file, ms2.pre)], :]
         ε = ε * 1.0e-6
         zs = range(zs[1], zs[2])
@@ -207,8 +207,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         Input("tab_psm", "derived_virtual_selected_rows"),
         Input("error_frag", "value"),
     ) do v1, v2, ε
-        r = v1[v2[begin] + 1]
-        r = df_psm[r.id, :]
+        r = df_psm[parse(Int, v1[v2[begin] + 1].id), :]
         ε = ε * 1.0e-6
         ms2 = df_ms2[di_ms2[(r.file, r.scan)], :]
         ions = MesMS.Plot.build_ions(ms2.ms.peaks, r.pep, r.mod, ε, ele_pfind, aa_pfind, mod_pfind)
