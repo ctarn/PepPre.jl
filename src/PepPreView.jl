@@ -25,12 +25,8 @@ iw_trace(mz, mz_w, h) = begin
 end
 
 run_peppre(peaks, mz, r, zs, ε, V, τ; mode=:mono) = begin
-    δs = map(zs) do z
-        if mode == :mono return 0.0 end
-        # else max mode
-        m = mz * z
-        i = argmax(MesMS.ipv_w(m, V))
-        return (MesMS.ipv_m(m, V)[i] - MesMS.ipv_m(m, V)[1]) / z
+    δs = mode == :mono ? zeros(length(zs)) : map(zs) do z
+        MesMS.ipv_dmz(mz, z, argmax(MesMS.ipv_w(mz, z, V)), V)
     end
     ions = [MesMS.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
     ions = filter(i -> i.mz * i.z < MesMS.ipv_max(V) && PepIso.prefilter(i, peaks, ε, V, mode), ions)

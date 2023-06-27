@@ -62,12 +62,8 @@ slice_ms1(M1, M2, r=NaN) = begin
 end
 
 evaluate(ms1, mz, r, zs, ε, V, τ, mode) = begin
-    δs = map(zs) do z
-        if mode == :mono return 0.0 end
-        # else max mode
-        m = mz * z
-        i = argmax(MesMS.ipv_w(m, V))
-        return (MesMS.ipv_m(m, V)[i] - MesMS.ipv_m(m, V)[1]) / z
+    δs = mode == :mono ? zeros(length(zs)) : map(zs) do z
+        MesMS.ipv_dmz(mz, z, argmax(MesMS.ipv_w(mz, z, V)), V)
     end
     ions = map(ms1) do spec
         peaks = MesMS.query(spec, mz - r - 2, mz + r + 1)
