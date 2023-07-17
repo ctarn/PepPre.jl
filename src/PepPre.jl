@@ -151,7 +151,7 @@ process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir) = begin
     M1 = slice_ms1(M1, M2, r)
 
     @info "evaluating"
-    I = @showprogress map(zip(M1, M2)) do (ms1, ms2)
+    I = @showprogress map(M1, M2) do ms1, ms2
         r_ = isnan(r) ? ms2.isolation_width / 2 : r
         ions = evaluate(ms1[8:9], ms2.activation_center, r_, zs, ε, V, τ, mode)
         if inst
@@ -165,7 +165,7 @@ process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir) = begin
         I_ = filter_by_fold(I, fold)
 
         @info "fine-tuning"
-        I_ = @showprogress map(zip(I_, M1)) do (ions, ms1)
+        I_ = @showprogress map(I_, M1) do ions, ms1
             map(ion -> tune_mass(ion, ms1, ε / 2), ions)
         end
 

@@ -237,10 +237,10 @@ end
 process(paths; path_psm, V, ele_pfind, aa_pfind, mod_pfind, host, port) = begin
     Ms = MesMS.read_ms.(paths)
     names = paths .|> basename .|> splitext .|> first
-    df_ms1 = map(zip(names, Ms)) do (file, M)
+    df_ms1 = map(names, Ms) do file, M
         map(m -> (; file, m.id, rt=m.retention_time, ms=m), M.MS1)
     end |> xs -> reduce(vcat, xs) |> DataFrames.DataFrame
-    df_ms2 = map(zip(names, Ms)) do (file, M)
+    df_ms2 = map(names, Ms) do file, M
         map(M.MS2) do m
             (; file, m.id, m.pre, rt=m.retention_time, mz=m.activation_center, mz_w=m.isolation_width, ms=m)
         end
