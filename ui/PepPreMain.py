@@ -59,7 +59,9 @@ def run():
     paths = []
     for p in V["data"].get().split(";"):
         ext = os.path.splitext(p)[1].lower()
-        if ext == ".ms2":
+        if ext == ".mes":
+            pass
+        elif ext == ".ms2":
             pass
         elif ext == ".ms1":
             print("ERROR: select MS2 files instead of MS1 files.")
