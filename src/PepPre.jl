@@ -93,7 +93,7 @@ end
 tune_mass(ion, ms1s, ε) = begin
     peaks = map(ms1s) do spec
         r = MesMS.argquery_ε(spec, ion.mz, ε)
-        return isempty(r) ? MesMS.Peak(0.0, 0.0) : MesMS.query_near(spec[r], ion.mz; by=x -> x.mz)
+        return isempty(r) ? MesMS.Peak(0.0, 0.0) : MesMS.query_near(spec[r], (; ion.mz); by=x -> x.mz)
     end
     mz = sum(p -> p.mz * p.inten, peaks) / sum(p -> p.inten, peaks)
     return isnan(mz) ? ion : (; ion..., mz)
