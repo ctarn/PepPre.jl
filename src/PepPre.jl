@@ -174,7 +174,7 @@ process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir) = begin
         for fmt in fmts
             ext = fmt ∈ ["csv", "tsv"] ? "precursor.$(fmt)" : fmt
             p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
-            MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2, I_; name), p), p)
+            MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2, I_; name), p; write=true), p)
         end
     end
 end
