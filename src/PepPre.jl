@@ -79,7 +79,7 @@ evaluate(ms1, mz, r, zs, ε, V, τ, mode) = begin
         inten = sum(p -> p.inten, MesMS.query(peaks, mz - r, mz + r), init=1.0e-16)
         ions = map(ions) do ion
             ratio = sum(MesMS.ipv_w(ion, V)[MesMS.argquery_δ(MesMS.ipv_mz(ion, V), mz, r)], init=0.0)
-            return (; mz=ion.mz::Float64, z=ion.z::Int, score=(ion.m * ion.x * ratio / inten)::Float64)
+            return (; mz=ion.mz::Float64, z=ion.z::Int, score=ion.m::Float64)
         end
         return filter(i -> i.score > 0, ions)
     end
