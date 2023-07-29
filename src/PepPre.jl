@@ -13,17 +13,18 @@ merge_ions(ions, ε) = begin
     length(ions) == 0 && return ans
     ions = sort(ions, by=i -> i.mz)
     sort!(ions, by=i -> i.z, alg=InsertionSort)
-    mz, z, score = ions[begin].mz, ions[begin].z, ions[begin].score
+    mz, z, score, e = ions[begin].mz, ions[begin].z, ions[begin].score, ions[begin].e
     for i in ions[begin+1:end]
         if MesMS.in_moe(i.mz, mz, ε) && i.z == z
             mz = (mz * score + i.mz * i.score) / (score + i.score)
             score += i.score
+            e = min(e, i.e)
         else
-            push!(ans, (; mz, z, score))
-            mz, z, score = i.mz, i.z, i.score
+            push!(ans, (; mz, z, e, score))
+            mz, z, score, e = i.mz, i.z, i.score, i.e
         end
     end
-    push!(ans, (; mz, z, score))
+    push!(ans, (; mz, z, e, score))
     return ans
 end
 
@@ -79,7 +80,7 @@ evaluate(ms1, mz, r, zs, ε, V, τ, mode) = begin
         inten = sum(p -> p.inten, MesMS.query(peaks, mz - r, mz + r), init=1.0e-16)
         ions = map(ions) do ion
             ratio = sum(MesMS.ipv_w(ion, V)[MesMS.argquery_δ(MesMS.ipv_mz(ion, V), mz, r)], init=0.0)
-            return (; mz=ion.mz::Float64, z=ion.z::Int, score=(ion.m * ion.x * ratio / inten)::Float64)
+            return (; mz=ion.mz::Float64, z=ion.z::Int, e=ion.e::Float64, score=(ion.m * ion.x * ratio / inten)::Float64)
         end
         return filter(i -> i.score > 0, ions)
     end
@@ -107,14 +108,14 @@ end
 
 write_ions(fmt, io, M, I; name="filename") = begin
     if fmt == "csv"
-        write(io, "scan,mz,z\n")
+        write(io, "scan,mz,z,mono_error\n")
         @showprogress for (ms, ions) in zip(M, I)
-            foreach(ion -> write(io, "$(ms.id),$(ion.mz),$(ion.z)\n"), ions)
+            foreach(ion -> write(io, "$(ms.id),$(ion.mz),$(ion.z),$(ion.e)\n"), ions)
         end
     elseif fmt == "tsv"
-        write(io, "scan\tmz\tz\n")
+        write(io, "scan\tmz\tz\tmono_error\n")
         @showprogress for (ms, ions) in zip(M, I)
-            foreach(ion -> write(io, "$(ms.id)\t$(ion.mz)\t$(ion.z)\n"), ions)
+            foreach(ion -> write(io, "$(ms.id)\t$(ion.mz)\t$(ion.z),$(ion.e)\n"), ions)
         end
     elseif fmt == "ms2"
         @showprogress for (ms, ions) in zip(M, I)
@@ -167,7 +168,7 @@ detect_precursor(path; inst, mode, V, r, zs, ε, τ, folds, fmts, subdir, out) =
         ions = evaluate(ms1[8:9], ms2.activation_center, r_, zs, ε, V, τ, mode)
         if inst
             ions = filter(i -> !any(x -> i.z == x.z && MesMS.in_moe(i.mz, x.mz, ε), ms2.ions), ions)
-            append!(ions, [(; i.mz, i.z, score=Inf) for i in ms2.ions])
+            append!(ions, [(; i.mz, i.z, e=0.0, score=Inf) for i in ms2.ions])
         end
         return sort(ions; by=i -> i.score, rev=true)
     end
