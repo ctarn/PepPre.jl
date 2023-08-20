@@ -66,6 +66,11 @@ div.toc img, div.ui img {
     width: 100%;
 }
 
+div.badge img.badge {
+    height: 32px;
+    margin-right: 16px;
+}
+
 div.release section {
     margin: 16px 0;
 }
@@ -109,6 +114,17 @@ pre.citation::-webkit-scrollbar {
 <div class="main">
 <h2>PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors</h2>
 
+<div class="badge">
+    <a href="https://doi.org/10.1101/2023.05.13.540645"><img class="badge" src='https://img.shields.io/badge/bioRxiv-10.1101/2023.05.13.540645-darkcyan.svg'/></a>
+    <a href="https://peppre.ctarn.io/doc/stable/"><img class="badge" src='https://img.shields.io/badge/doc-stable-blue.svg'/></a>
+    <a href="https://peppre.ctarn.io/doc/dev/"><img class="badge" src='https://img.shields.io/badge/doc-latest-red.svg'/></a>
+</div>
+<div class="badge">
+    <a href="https://github.com/ctarn/PepPre.jl"><img class="badge" src='https://img.shields.io/badge/code-GitHub-green.svg'/></a>
+    <a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.0.0/Example.zip"><img class="badge" src='https://img.shields.io/badge/data-MS1,MS2,MGF-green.svg'/></a>
+    <a href="https://www.ebi.ac.uk/pride/archive/projects/PXD000999"><img class="badge" src='https://img.shields.io/badge/data-PXD000999-green.svg'/></a>
+</div>
+
 <h2>Abstract</h2>
 <div class="toc"><img src="fig/PepPre_toc.svg" alt="toc"/></div>
 <p>
@@ -143,12 +159,6 @@ pre.citation::-webkit-scrollbar {
     <li>PepPre will generate the isotopic pattern vectors (IPV) on the first run, and it may cost minutes.</li>
 </ul>
 
-<h2>Source</h2>
-<ul>
-    <li><a href="https://github.com/ctarn/MesMS.jl">MesMS.jl</a></li>
-    <li><a href="https://github.com/ctarn/PepPre.jl">PepPre.jl</a></li>
-</ul>
-
 <h2>Release</h2>
 <div class="ui"><img src="fig/PepPre_ui.png" alt="ui"/></div>
 {{ release }}
@@ -169,12 +179,6 @@ pre.citation::-webkit-scrollbar {
         Otherwise, please add the software to white list.
         You can also package the software from source yourself.
     </li>
-</ul>
-
-<h2>Example Data</h2>
-<ul>
-    <li><a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.0.0/Example.zip">MS1, MS2, and PSM</a></li>
-    <li><a href="https://www.ebi.ac.uk/pride/archive/projects/PXD000999">PXD000999</a></li>
 </ul>
 
 <h2>Citation</h2>
