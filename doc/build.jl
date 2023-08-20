@@ -29,5 +29,12 @@ end
 
 Documenter.deploydocs(repo=repo, target=joinpath("..", out), versions=nothing)
 
-Documenter.makedocs(sitename="PepPre", build=joinpath("..", out))
-Documenter.deploydocs(repo=repo, target=joinpath("..", out), dirname="doc")
+pages = [
+    "Home" => "index.md",
+    "usage.md",
+    "dev.md",
+    "faq.md",
+]
+
+Documenter.makedocs(; sitename="PepPre", build=joinpath("..", out), pages)
+Documenter.deploydocs(; repo, target=joinpath("..", out), dirname="doc")
