@@ -66,6 +66,10 @@ div.toc img, div.ui img {
     width: 100%;
 }
 
+div.badge {
+    margin: 8px;
+}
+
 div.badge img.badge {
     height: 32px;
     margin-right: 16px;
@@ -118,6 +122,7 @@ pre.citation::-webkit-scrollbar {
     <a href="https://doi.org/10.1101/2023.05.13.540645"><img class="badge" src='https://img.shields.io/badge/bioRxiv-10.1101/2023.05.13.540645-darkcyan.svg'/></a>
     <a href="https://peppre.ctarn.io/doc/stable/"><img class="badge" src='https://img.shields.io/badge/doc-stable-blue.svg'/></a>
     <a href="https://peppre.ctarn.io/doc/dev/"><img class="badge" src='https://img.shields.io/badge/doc-latest-red.svg'/></a>
+    <a href="https://peppre.ctarn.io/doc/dev/faq/"><img class="badge" src='https://img.shields.io/badge/doc-FAQ-yellow.svg'/></a>
 </div>
 <div class="badge">
     <a href="https://github.com/ctarn/PepPre.jl"><img class="badge" src='https://img.shields.io/badge/code-GitHub-green.svg'/></a>
@@ -162,24 +167,6 @@ pre.citation::-webkit-scrollbar {
 <h2>Release</h2>
 <div class="ui"><img src="fig/PepPre_ui.png" alt="ui"/></div>
 {{ release }}
-
-<h2>Q&A</h2>
-<ul>
-    <li>
-        macOS says: “PepPre.app” is damaged and can’t be opened. You should move it to the Trash.
-        <br /><br />
-        Please run `sudo xattr -r -d com.apple.quarantine [path/to/PepPre.app]` in terminal.
-    </li>
-    <br />
-    <li>
-        Windows Security stops the software and deletes the .exe file.
-        <br /><br />
-        The software is packaged using PyInstaller, and can be detected as virus by mistake on Windows (see <a href="https://github.com/pyinstaller/pyinstaller/issues/5932">the issue</a>).
-        Please restore the deleted file from `Protection History`, and Windows Security should not stop or delete it again.
-        Otherwise, please add the software to white list.
-        You can also package the software from source yourself.
-    </li>
-</ul>
 
 <h2>Citation</h2>
 <h4>BibTeX</h4>
