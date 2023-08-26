@@ -187,9 +187,6 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         filter!(i -> i.score ≥ s, ions)
         fig = plot_peppre(ps, ms2.mz, ms2.mz_w, ions, df_psm[ms2.psm, :], ε, V)
         table_data = Dict.(pairs.(eachrow(string.(df_psm[ms2.psm, :]))))
-        for i in table_data
-            i[:mod] = pFind.modstr(i[:mod])
-        end
         cfg = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_$(r.file)_$(r.id)").fields)
         return table_data, fig, cfg
     end
