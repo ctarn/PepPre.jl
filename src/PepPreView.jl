@@ -223,11 +223,11 @@ prepare(args) = begin
     if isempty(path_cfg)
         ele_pfind = pFind.read_element() |> NamedTuple
         aa_pfind = map(x -> MesMS.mass(x, ele_pfind), pFind.read_amino_acid() |> NamedTuple)
-        mod_pfind = MesMS.mapvalue(x -> x.mass, pFind.read_mod())
+        mod_pfind = MesMS.mapvalue(x -> x.mass, pFind.read_modification())
     else
         ele_pfind = pFind.read_element(joinpath(path_cfg, "element.ini")) |> NamedTuple
         aa_pfind = map(x -> MesMS.mass(x, ele_pfind), pFind.read_amino_acid(joinpath(path_cfg, "aa.ini")) |> NamedTuple)
-        mod_pfind = MesMS.mapvalue(x -> x.mass, pFind.read_mod(joinpath(path_cfg, "modification.ini")))
+        mod_pfind = MesMS.mapvalue(x -> x.mass, pFind.read_modification(joinpath(path_cfg, "modification.ini")))
     end
     host = parse(IPAddr, args["host"])
     port = parse(Int, args["port"])
