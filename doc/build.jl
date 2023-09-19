@@ -5,7 +5,7 @@ import Documenter
 repo = "github.com/ctarn/PepPre.jl.git"
 
 root = "doc"
-out = joinpath("tmp", "doc")
+out = joinpath(root, "tmp", "doc")
 
 rm(out; force=true, recursive=true)
 LibGit2.clone("https://$(repo)", out, branch="gh-pages")
