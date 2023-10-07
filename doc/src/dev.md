@@ -6,14 +6,14 @@ Please install Julia (version 1.9 or newer) from [https://julialang.org](https:/
 
 ## Clone the Repos
 
-Please clone [MesMS.jl](https://github.com/ctarn/MesMS.jl) and [PepPre.jl](https://github.com/ctarn/PepPre.jl) by:
+Please clone [MesMS.jl](https://github.com/MesMS/MesMS.jl) and [PepPre.jl](https://github.com/ctarn/PepPre.jl) by:
 ```sh
-git clone git@github.com:ctarn/MesMS.jl.git
+git clone git@github.com:MesMS/MesMS.jl.git
 git clone git@github.com:ctarn/PepPre.jl.git
 ```
 or
 ```sh
-git clone https://github.com/ctarn/MesMS.jl.git
+git clone https://github.com/MesMS/MesMS.jl.git
 git clone https://github.com/ctarn/PepPre.jl.git
 ```
 
