@@ -144,10 +144,11 @@ prepare(args) = begin
     inst = args["inst"]::Bool
     fmts = split(args["fmt"], ",")
     subdir = ':' ∈ args["fold"]
-    return (; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir)
+    batchsize = parse(Int, args["split"])
+    return (; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize)
 end
 
-process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir) = begin
+process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize) = begin
     M = MesMS.read_ms(path)
     M1, M2 = M.MS1, M.MS2
     prepend!(M1, [MesMS.MS1(id=typemin(Int)) for i in 1:8])
@@ -178,8 +179,17 @@ process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir) = begin
         name = basename(splitext(path)[1])
         for fmt in fmts
             ext = fmt ∈ ["csv", "tsv"] ? "precursor.$(fmt)" : fmt
-            p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
-            MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2, I_; name), p; write=true), p)
+            if batchsize ≤ 0
+                p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
+                MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2, I_; name), p; write=true), p)
+            else
+                nbatch = length(M2)÷batchsize
+                for i in 1:nbatch
+                    r = (i * batchsize):min(length(M2), (i + 1) * batchsize)
+                    p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(nbatch)_$(i).$(ext)")
+                    MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2[r], I_[r]; name), p; write=true), p)
+                end
+            end
         end
     end
 end
@@ -223,6 +233,10 @@ main() = begin
             help = "number of precursor ions"
             metavar = "fold"
             default = "4.0"
+        "--split"
+            help = "split into sub-files"
+            metavar = "n"
+            default = "0"
         "--inst"
             help = "preserve original (instrument) ions"
             action = :store_true
