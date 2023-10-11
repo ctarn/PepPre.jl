@@ -120,6 +120,11 @@ write_ions(fmt, io, M, I; name="filename") = begin
                 MesMS.write_mgf(io, MesMS.fork(ms; ions=[MesMS.Ion(ion.mz, ion.z)]), "$(name).$(ms.id).$(ms.id).$(ion.z).$(idx-1).dta")
             end
         end
+    elseif fmt == "pf2"
+        M_ = map((ms, ions) -> MesMS.fork(ms; ions=[MesMS.Ion(ion.mz, ion.z) for ion in ions]), M, I)
+        MesMS.write_pf2(io, M_, name)
+    else
+        @error "unknown format: $(fmt)"
     end
 end
 
@@ -223,7 +228,7 @@ main() = begin
             action = :store_true
         "--fmt", "-f"
             help = "output format"
-            metavar = "csv,tsv,ms2,mgf"
+            metavar = "csv,tsv,ms2,mgf,pf2"
             default = "csv"
     end
     args = ArgParse.parse_args(settings)

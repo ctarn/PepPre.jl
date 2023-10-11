@@ -22,7 +22,7 @@ if util.is_darwin:
 else:
     path_mono = "mono"
 
-fmts = ["csv", "tsv", "ms2", "mgf"]
+fmts = ["csv", "tsv", "ms2", "mgf", "pf2"]
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
     "out": {"type": tk.StringVar, "value": ""},
@@ -34,15 +34,12 @@ vars_spec = {
     "exclusion": {"type": tk.StringVar, "value": "1.0"},
     "fold": {"type": tk.StringVar, "value": "4.0"},
     "inst": {"type": tk.IntVar, "value": 0},
-    "fmt_csv": {"type": tk.IntVar, "value": 1},
-    "fmt_tsv": {"type": tk.IntVar, "value": 0},
-    "fmt_ms2": {"type": tk.IntVar, "value": 0},
-    "fmt_mgf": {"type": tk.IntVar, "value": 0},
     "peppre": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPre")},
     "thermorawread": {"type": tk.StringVar, "value": util.get_content("ThermoRawRead", "ThermoRawRead.exe", shared=True)},
     "mono": {"type": tk.StringVar, "value": path_mono},
     "msconvert": {"type": tk.StringVar, "value": util.get_content("ProteoWizard", "msconvert")},
 }
+for fmt in fmts: vars_spec[f"fmt_{fmt}"] = {"type": tk.IntVar, "value": fmt in ["csv"]}
 task = util.Task("PepPre", vars_spec, path=meta.homedir)
 V = task.vars
 
