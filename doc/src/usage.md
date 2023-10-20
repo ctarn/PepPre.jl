@@ -64,6 +64,11 @@ optional arguments:
 
 For macOS users, the executable files would be located at `/Applications/MesMS/PepPre.app/Contents/MacOS/content/` by default.
 
+## Parameters
+
+- It is recommended to set the mass error to 10 ppm. And for MS1 scans with resolution ≤ 30k, error < 10 ppm may cause performance loss.
+- The `IPV` would be generated automatically based on the Averagine model.
+
 ## Input and Output
 
 The software accepts `.mes`, `.ms1/.ms2`, and `.raw` files as input.
