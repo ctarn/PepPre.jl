@@ -96,13 +96,16 @@ class Task:
     running = False
     skip_rest = False
 
-    def __init__(self, name, vars_spec={}, vars=None, path=None):
+    def __init__(self, name, vars_spec={}, vars=None, path=None, shared_vars_spec={}, shared_vars={}):
         self.name = name
         self.vars_spec = vars_spec
         self.vars = {k: v["type"](value=v["value"]) for k, v in vars_spec.items()} if vars is None else vars
         self.path = path
         # load autosave
         if self.path is not None: load_task(os.path.join(self.path, f"{self.name}.task"), self.vars)
+        # merge shared vars but do not load autosave here
+        self.vars_spec.update(shared_vars_spec)
+        self.vars.update(shared_vars)
 
     def load(self):
         path = filedialog.askopenfilename(filetypes=(("Configuration", "*.task"), ("All", "*.*")))
@@ -179,8 +182,8 @@ def add_headline(weight, url):
     threading.Thread(target=lambda: show_headline(var, url)).start()
     return ttk.Label(weight, textvariable=var, justify="center"), var
 
-def add_console(weight):
-    console = tk.Text(weight, height=12, state="disabled")
+def add_console(weight, height=12):
+    console = tk.Text(weight, height=height, state="disabled")
     sys.stdout = Console(console)
     sys.stderr = Console(console)
     return console
@@ -211,6 +214,10 @@ def add_entry(form, row, label, entry, ext="", func=None):
             ext.grid(column=2, row=row, **sty_button)
     return label, entry, ext
 
+def add_separator(form, row, label=None):
+    ttk.Separator(form, orient=tk.HORIZONTAL).grid(column=0, row=row, columnspan=3, sticky="EW")
+    if label is not None: ttk.Label(form, text=label).grid(column=0, row=row, columnspan=3)
+
 def askfile(var, out=None, **kwargs):
     def f():
         path = filedialog.askopenfilename(**kwargs)
@@ -240,4 +247,11 @@ def askfiles(var, out=None, **kwargs):
         var.set(";".join(paths))
         if len(var.get()) > 0 and out is not None and len(out.get()) == 0:
             out.set(os.path.join(os.path.dirname(paths[0]), "out"))
+    return f
+
+def switch_widget(var, widgets, row):
+    def f(_=None, verbose=True):
+        for w in widgets.values(): w.grid_forget()
+        if verbose: print("selected:", var.get())
+        widgets[var.get()].grid(column=0, row=row, columnspan=3, sticky="EW")
     return f
