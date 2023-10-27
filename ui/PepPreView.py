@@ -25,11 +25,9 @@ vars_spec = {
     "out": {"type": tk.StringVar, "value": ""},
     "psm": {"type": tk.StringVar, "value": ""},
     "ipv": {"type": tk.StringVar, "value": os.path.join(meta.homedir, "peptide.ipv")},
-    "peppreview": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreView")},
-    "cfg": {"type": tk.StringVar, "value": ""},
     "url": {"type": tk.StringVar, "value": "127.0.0.1:30030"},
 }
-task = util.Task("PepPreView", vars_spec, path=meta.homedir)
+task = util.Task("PepPreView", vars_spec, path=meta.homedir, shared_vars_spec=meta.vars_spec, shared_vars=meta.vars)
 V = task.vars
 
 def run():
@@ -59,17 +57,10 @@ I += 1
 t = (("IPV", "*.ipv"), ("All", "*.*"))
 util.add_entry(main, I, "Isotope Pattern:", V["ipv"], "Select", util.askfile(V["ipv"], filetypes=t))
 I += 1
+util.add_entry(main, I, "URL:", V["url"], "New Port", new_port)
+I += 1
 util.add_entry(main, I, "Output Directory:", V["out"], "Select", util.askdir(V["out"]))
 I += 1
 task.init_ctrl(ttk.Frame(main), run).grid(column=0, row=I, columnspan=3)
-I += 1
-ttk.Separator(main, orient=tk.HORIZONTAL).grid(column=0, row=I, columnspan=3, sticky="EW")
-ttk.Label(main, text="Advanced Configuration").grid(column=0, row=I, columnspan=3)
-I += 1
-util.add_entry(main, I, "PepPreView:", V["peppreview"], "Select", util.askfile(V["peppreview"]))
-I += 1
-util.add_entry(main, I, "pFind Directory:", V["cfg"], "Select", util.askdir(V["cfg"]))
-I += 1
-util.add_entry(main, I, "URL:", V["url"], "New Port", new_port)
 I += 1
 ttk.Label(main, text=footnote, justify="left").grid(column=0, row=I, columnspan=3, sticky="EW")

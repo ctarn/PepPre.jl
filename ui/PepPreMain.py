@@ -17,11 +17,6 @@ Note:
 main = ttk.Frame()
 main.pack(fill="both")
 
-if util.is_darwin:
-    path_mono = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono"
-else:
-    path_mono = "mono"
-
 fmts = ["csv", "tsv", "ms2", "mgf", "pf2"]
 vars_spec = {
     "data": {"type": tk.StringVar, "value": ""},
@@ -34,13 +29,9 @@ vars_spec = {
     "exclusion": {"type": tk.StringVar, "value": "1.0"},
     "fold": {"type": tk.StringVar, "value": "4.0"},
     "inst": {"type": tk.IntVar, "value": 0},
-    "peppre": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPre")},
-    "thermorawread": {"type": tk.StringVar, "value": util.get_content("ThermoRawRead", "ThermoRawRead.exe", shared=True)},
-    "mono": {"type": tk.StringVar, "value": path_mono},
-    "msconvert": {"type": tk.StringVar, "value": util.get_content("ProteoWizard", "msconvert")},
 }
 for fmt in fmts: vars_spec[f"fmt_{fmt}"] = {"type": tk.IntVar, "value": fmt in ["csv"]}
-task = util.Task("PepPre", vars_spec, path=meta.homedir)
+task = util.Task("PepPre", vars_spec, path=meta.homedir, shared_vars_spec=meta.vars_spec, shared_vars=meta.vars)
 V = task.vars
 
 def run_thermorawread(data, out):
@@ -113,17 +104,4 @@ util.add_entry(main, I, "Output Directory:", V["out"], "Select", util.askdir(V["
 I += 1
 task.init_ctrl(ttk.Frame(main), run).grid(column=0, row=I, columnspan=3)
 I += 1
-ttk.Separator(main, orient=tk.HORIZONTAL).grid(column=0, row=I, columnspan=3, sticky="EW")
-ttk.Label(main, text="Advanced Configuration").grid(column=0, row=I, columnspan=3)
-I += 1
-util.add_entry(main, I, "PepPre:", V["peppre"], "Select", util.askfile(V["peppre"]))
-I += 1
-util.add_entry(main, I, "ThermoRawRead:", V["thermorawread"], "Select", util.askfile(V["thermorawread"]))
-I += 1
-if not util.is_windows:
-    util.add_entry(main, I, "Mono Runtime:", V["mono"], "Select", util.askfile(V["mono"]))
-    I += 1
-if util.is_windows:
-    util.add_entry(main, I, "MsConvert:", V["msconvert"], "Select", util.askfile(V["msconvert"]))
-    I += 1
 ttk.Label(main, text=footnote, justify="left").grid(column=0, row=I, columnspan=3, sticky="EW")
