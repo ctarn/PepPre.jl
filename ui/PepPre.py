@@ -14,11 +14,13 @@ notebook.pack(fill="x")
 util.add_console(main).pack(fill="x")
 ttk.Label(main, text=meta.copyright, justify="center").pack()
 
-import PepPreIsolated, PepPreView, citation, extra
+import PepPreIsolated, PepPreGlobal, PepPreAlign, PepPreView, extra, citation
 notebook.add(PepPreIsolated.main, text="Isolated Precursor")
+notebook.add(PepPreGlobal.main, text="Global Precursor")
+notebook.add(PepPreAlign.main, text="Precursor Alignment")
 notebook.add(PepPreView.main, text="Visualization")
-notebook.add(citation.main, text="Citation")
 notebook.add(extra.main, text="Extra Configuration")
+notebook.add(citation.main, text="Citation")
 
 util.bind_exit(meta.win, [PepPreIsolated, PepPreView])
 util.center_window(meta.win)

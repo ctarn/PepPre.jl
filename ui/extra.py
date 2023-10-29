@@ -14,6 +14,10 @@ util.init_form(main)
 I = 0
 util.add_entry(main, I, "PepPreIsolated:", V["peppreisolated"], "Select", util.askfile(V["peppreisolated"]))
 I += 1
+util.add_entry(main, I, "PepPreGlobal:", V["peppreglobal"], "Select", util.askfile(V["peppreglobal"]))
+I += 1
+util.add_entry(main, I, "PepPreAlign:", V["pepprealign"], "Select", util.askfile(V["pepprealign"]))
+I += 1
 util.add_entry(main, I, "PepPreView:", V["peppreview"], "Select", util.askfile(V["peppreview"]))
 I += 1
 util.add_entry(main, I, "ThermoRawRead:", V["thermorawread"], "Select", util.askfile(V["thermorawread"]))

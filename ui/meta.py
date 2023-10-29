@@ -38,6 +38,8 @@ else:
 
 vars_spec = {
     "peppreisolated": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreIsolated")},
+    "peppreglobal": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreGlobal")},
+    "pepprealign": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreAlign")},
     "peppreview": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreView")},
     "thermorawread": {"type": tk.StringVar, "value": util.get_content("ThermoRawRead", "ThermoRawRead.exe", shared=True)},
     "mono": {"type": tk.StringVar, "value": path_mono},
