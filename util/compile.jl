@@ -1,7 +1,7 @@
 import PackageCompiler
 import TOML
 
-exes = ["PepPre", "PepPreView"]
+exes = ["PepPreIsolated", "PepPreView"]
 
 cfg = TOML.parsefile("Project.toml")
 dir = "tmp/$(Sys.ARCH).$(Sys.iswindows() ? "Windows" : Sys.KERNEL)/$(cfg["name"])"

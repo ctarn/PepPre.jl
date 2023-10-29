@@ -31,7 +31,7 @@ vars_spec = {
     "inst": {"type": tk.IntVar, "value": 0},
 }
 for fmt in fmts: vars_spec[f"fmt_{fmt}"] = {"type": tk.IntVar, "value": fmt in ["csv"]}
-task = util.Task("PepPre", vars_spec, path=meta.homedir, shared_vars_spec=meta.vars_spec, shared_vars=meta.vars)
+task = util.Task("PepPreIsolated", vars_spec, path=meta.homedir, shared_vars_spec=meta.vars_spec, shared_vars=meta.vars)
 V = task.vars
 
 def run_thermorawread(data, out):
@@ -62,7 +62,7 @@ def run():
             print("WARN: file not supported and skipped, path =", p)
             continue
         paths.append(p)
-    task.call(V["peppre"].get(), *paths, "--out", V["out"].get(),
+    task.call(V["peppreisolated"].get(), *paths, "--out", V["out"].get(),
         "--ipv", V["ipv"].get(),
         "--width", V["width"].get(),
         "--charge", V["charge_min"].get() + ":" + V["charge_max"].get(),

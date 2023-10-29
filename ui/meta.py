@@ -37,7 +37,7 @@ else:
     path_mono = "mono"
 
 vars_spec = {
-    "peppre": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPre")},
+    "peppreisolated": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreIsolated")},
     "peppreview": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreView")},
     "thermorawread": {"type": tk.StringVar, "value": util.get_content("ThermoRawRead", "ThermoRawRead.exe", shared=True)},
     "mono": {"type": tk.StringVar, "value": path_mono},

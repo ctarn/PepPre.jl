@@ -12,7 +12,7 @@ path = os.path.join(meta.homedir, "extra.cfg")
 
 util.init_form(main)
 I = 0
-util.add_entry(main, I, "PepPre:", V["peppre"], "Select", util.askfile(V["peppre"]))
+util.add_entry(main, I, "PepPreIsolated:", V["peppreisolated"], "Select", util.askfile(V["peppreisolated"]))
 I += 1
 util.add_entry(main, I, "PepPreView:", V["peppreview"], "Select", util.askfile(V["peppreview"]))
 I += 1
