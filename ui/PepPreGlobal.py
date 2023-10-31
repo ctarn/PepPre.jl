@@ -31,7 +31,7 @@ task = util.Task("PepPreGlobal", vars_spec, path=meta.homedir, shared_vars_spec=
 V = task.vars
 
 def run_thermorawread(data, out):
-    task.call(*([] if util.is_windows else [V["mono"].get()]), V["thermorawread"].get(), "mes", data, out)
+    task.call(*([] if util.is_windows else [V["monoruntime"].get()]), V["thermorawread"].get(), "mes", data, out)
     return os.path.join(out, os.path.splitext(os.path.basename(data))[0] + ".mes")
 
 def run():

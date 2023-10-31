@@ -23,7 +23,7 @@ I += 1
 util.add_entry(main, I, "ThermoRawRead:", V["thermorawread"], "Select", util.askfile(V["thermorawread"]))
 I += 1
 if not util.is_windows:
-    util.add_entry(main, I, "Mono Runtime:", V["mono"], "Select", util.askfile(V["mono"]))
+    util.add_entry(main, I, "Mono Runtime:", V["monoruntime"], "Select", util.askfile(V["monoruntime"]))
     I += 1
 if util.is_windows:
     util.add_entry(main, I, "MsConvert:", V["msconvert"], "Select", util.askfile(V["msconvert"]))

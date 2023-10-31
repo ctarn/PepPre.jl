@@ -42,7 +42,7 @@ vars_spec = {
     "pepprealign": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreAlign")},
     "peppreview": {"type": tk.StringVar, "value": util.get_content("PepPre", "bin", "PepPreView")},
     "thermorawread": {"type": tk.StringVar, "value": util.get_content("ThermoRawRead", "ThermoRawRead.exe", shared=True)},
-    "mono": {"type": tk.StringVar, "value": path_mono},
+    "monoruntime": {"type": tk.StringVar, "value": path_mono},
     "msconvert": {"type": tk.StringVar, "value": util.get_content("ProteoWizard", "msconvert")},
     "cfg": {"type": tk.StringVar, "value": ""},
 }
