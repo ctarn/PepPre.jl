@@ -99,35 +99,6 @@ tune_mass(ion, ms1s, ε) = begin
     return isnan(mz) ? ion : (; ion..., mz)
 end
 
-write_ions(fmt, io, M, I; name="filename") = begin
-    if fmt == "csv"
-        write(io, "scan,mz,z\n")
-        @showprogress for (ms, ions) in zip(M, I)
-            foreach(ion -> write(io, "$(ms.id),$(ion.mz),$(ion.z)\n"), ions)
-        end
-    elseif fmt == "tsv"
-        write(io, "scan\tmz\tz\n")
-        @showprogress for (ms, ions) in zip(M, I)
-            foreach(ion -> write(io, "$(ms.id)\t$(ion.mz)\t$(ion.z)\n"), ions)
-        end
-    elseif fmt == "ms2"
-        @showprogress for (ms, ions) in zip(M, I)
-            MesMS.write_ms2(io, MesMS.fork(ms; ions=[MesMS.Ion(ion.mz, ion.z) for ion in ions]))
-        end
-    elseif fmt == "mgf"
-        @showprogress for (ms, ions) in zip(M, I)
-            for (idx, ion) in enumerate(ions)
-                MesMS.write_mgf(io, MesMS.fork(ms; ions=[MesMS.Ion(ion.mz, ion.z)]), "$(name).$(ms.id).$(ms.id).$(ion.z).$(idx-1).dta")
-            end
-        end
-    elseif fmt == "pf2"
-        M_ = map((ms, ions) -> MesMS.fork(ms; ions=[MesMS.Ion(ion.mz, ion.z) for ion in ions]), M, I)
-        MesMS.write_pf2(io, M_, name)
-    else
-        @error "unknown format: $(fmt)"
-    end
-end
-
 prepare(args) = begin
     out = mkpath(args["out"])
     V = MesMS.build_ipv(args["ipv"])
@@ -142,7 +113,7 @@ prepare(args) = begin
     τ = parse(Float64, args["thres"])
     folds = Vector{Float64}(MesMS.parse_range(Float64, args["fold"]))
     inst = args["inst"]::Bool
-    fmts = split(args["fmt"], ",")
+    fmts = split(args["fmt"], ",") .|> strip .|> Symbol
     subdir = ':' ∈ args["fold"]
     batchsize = parse(Int, args["split"])
     return (; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize)
@@ -178,16 +149,16 @@ process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize)
         report_ions(I_, map(m -> m.ions, M2), ε)
         name = basename(splitext(path)[1])
         for fmt in fmts
-            ext = fmt ∈ ["csv", "tsv"] ? "precursor.$(fmt)" : fmt
+            ext = fmt ∈ [:csv, :tsv] ? "precursor.$(fmt)" : fmt
             if batchsize ≤ 0
                 p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(ext)")
-                MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2, I_; name), p; write=true), p)
+                MesMS.safe_save(p -> MesMS.write_ms_with_precursor(p, M2, I_; fmt, name), p)
             else
                 nbatch = length(M2)÷batchsize
                 for i in 1:nbatch
                     r = (i * batchsize):min(length(M2), (i + 1) * batchsize)
                     p = joinpath(subdir ? joinpath(out, "$(fold)") : out, "$(name).$(nbatch)_$(i).$(ext)")
-                    MesMS.safe_save(p -> open(io -> write_ions(fmt, io, M2[r], I_[r]; name), p; write=true), p)
+                    MesMS.safe_save(p -> MesMS.write_ms_with_precursor(p, M2[r], I_[r]; fmt, name), p)
                 end
             end
         end
