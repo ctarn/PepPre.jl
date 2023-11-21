@@ -32,7 +32,7 @@ process(path; out, V, n_peak, zs, ε, τ, gap) = begin
     end
     G = PepIso.group_ions(I, gap, ε)
     d = Dict{Int, Int}()
-    foreach(l -> d[l] = get(d, l, 0) + 1, map(length, G))
+    foreach(l -> d[l] = get(d, l, 0) + 1, length.(G))
     foreach(k -> println("$(k)\t$(get(d, k, 0))"), minimum(keys(d)):100)
     @info "analysing"
     P = @showprogress map(ions -> PepIso.build_precursor(ions, ε, V), G)
