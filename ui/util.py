@@ -177,11 +177,6 @@ def show_headline(var, url):
     except:
         pass
 
-def add_headline(weight, url):
-    var = tk.StringVar()
-    threading.Thread(target=lambda: show_headline(var, url)).start()
-    return ttk.Label(weight, textvariable=var, justify="center"), var
-
 def add_console(weight, height=12):
     console = tk.Text(weight, height=height, state="disabled")
     sys.stdout = Console(console)
