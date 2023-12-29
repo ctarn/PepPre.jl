@@ -5,7 +5,7 @@ import tkinter as tk
 import util
 
 name = "PepPre"
-version = "1.3.0-dev"
+version = "1.3.0"
 author = "Tarn Yeong Ching"
 url = f"http://{name.lower()}.ctarn.io"
 server = f"http://api.ctarn.io/{name}/{version}"
