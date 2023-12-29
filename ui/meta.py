@@ -14,15 +14,14 @@ homedir = os.path.join(Path.home(), f".{name}", f"v{'.'.join(version.split('.')[
 citation_bib = """@article{Tarn2023PepPre,
     author = {Ching Tarn and Yu-Zhuo Wu and Kai-Fei Wang},
     title = {PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors},
+    journal = {Journal of Proteome Research},
+    doi = {10.1021/acs.jproteome.3c00293},
+    url = {https://doi.org/10.1021/acs.jproteome.3c00293},
     year = {2023},
-    doi = {10.1101/2023.05.13.540645},
-    publisher = {Cold Spring Harbor Laboratory},
-    URL = {https://www.biorxiv.org/content/early/2023/05/14/2023.05.13.540645},
-    eprint = {https://www.biorxiv.org/content/early/2023/05/14/2023.05.13.540645.full.pdf},
-    journal = {bioRxiv}
+    type = {Journal Article}
 }
 """
-citation_apa = """Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. bioRxiv, 2023.2005.2013.540645. https://doi.org/10.1101/2023.05.13.540645"""
+citation_apa = """Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. Journal of Proteome Research. https://doi.org/10.1021/acs.jproteome.3c00293"""
 
 os.makedirs(homedir, exist_ok=True)
 
