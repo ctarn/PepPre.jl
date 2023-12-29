@@ -125,18 +125,14 @@ pre.citation::-webkit-scrollbar {
 <h2>PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors</h2>
 
 <div class="badge">
-    <a href="https://doi.org/10.1101/2023.05.13.540645"><img class="badge" src='https://img.shields.io/badge/bioRxiv-10.1101/2023.05.13.540645-darkcyan.svg'/></a>
+    <a href="https://doi.org/10.1021/acs.jproteome.3c00293"><img class="badge" src='https://img.shields.io/badge/J. Proteome Res.-10.1021/acs.jproteome.3c00293-darkcyan.svg'/></a>
+    <a href="https://peppre.ctarn.io/fig/PepPre_CNHUPO.pdf"><img class="badge" src='https://img.shields.io/badge/CNHUPO-Poster-blue.svg'/></a>
+</div>
+<div class="badge">
     <a href="https://peppre.ctarn.io/doc/dev/"><img class="badge" src='https://img.shields.io/badge/doc-latest-red.svg'/></a>
     <a href="https://peppre.ctarn.io/doc/stable/"><img class="badge" src='https://img.shields.io/badge/doc-stable-blue.svg'/></a>
     <a href="https://peppre.ctarn.io/doc/dev/faq/"><img class="badge" src='https://img.shields.io/badge/doc-FAQ-yellow.svg'/></a>
-</div>
-<div class="badge">
     <a href="https://github.com/ctarn/PepPre.jl"><img class="badge" src='https://img.shields.io/badge/code-GitHub-green.svg'/></a>
-    <a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.0.0/Example.zip"><img class="badge" src='https://img.shields.io/badge/data-MS1,MS2,MGF-green.svg'/></a>
-    <a href="https://www.ebi.ac.uk/pride/archive/projects/PXD000999"><img class="badge" src='https://img.shields.io/badge/data-PXD000999-green.svg'/></a>
-</div>
-<div class="badge">
-    <a href="https://peppre.ctarn.io/fig/PepPre_CNHUPO.pdf"><img class="badge" src='https://img.shields.io/badge/CNHUPO-Poster-blue.svg'/></a>
 </div>
 
 <h2>Abstract</h2>
@@ -169,13 +165,33 @@ pre.citation::-webkit-scrollbar {
 
 <h2>Usage</h2>
 <ul>
-    <li>Please try <a href="http://pepfeat.ctarn.io">PepFeat</a> if you want to detect peptide features from LC-MS map.</li>
     <li>PepPre will generate the isotopic pattern vectors (IPV) on the first run, and it may cost minutes.</li>
 </ul>
 
 <h2>Release</h2>
 <div class="ui"><img src="fig/PepPre_ui.png" alt="ui"/></div>
-<div class="release"><section><time>2023-5-7</time>
+<div class="release"><section><time>2023-12-29</time>
+<h4>PepPre 1.3.0</h4>
+<div>
+<a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.3.0/PepPre-1.3.0.x86_64.Linux.zip">Linux</a>
+|
+<a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.3.0/PepPre-1.3.0.x86_64.Darwin.pkg">macOS (pkg)</a>
+|
+<a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.3.0/PepPre-1.3.0.x86_64.Darwin.zip">macOS (zip)</a>
+|
+<a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.3.0/PepPre-1.3.0.x86_64.Windows.zip">Windows</a>
+</div>
+🎉 Our paper “<a href="https://doi.org/10.1021/acs.jproteome.3c00293">PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors</a>” has been accepted by Journal of Proteome Research!
+<div>Note:
+<ol>
+    <li>add experimental features for global peptide precursor analysis.</li>
+    <li>support .mes input, which is a binary format and is much faster than text-base formats.</li>
+    <li>able to split output into batches to support large data from instrument such as Astral.</li>
+    <li>support .pf2 output, which is commonly used by software from pFind Team.</li>
+    <li>improved UI.</li>
+</ol>
+</div>
+</section><section><time>2023-5-7</time>
 <h4>PepPre 1.2.0</h4>
 <div>
 <a href="https://github.com/ctarn/PepPre.jl/releases/download/v1.2.0/PepPre-1.2.0.x86_64.Linux.zip">Linux</a>
@@ -279,17 +295,16 @@ pre.citation::-webkit-scrollbar {
 @article{Tarn2023PepPre,
     author = {Ching Tarn and Yu-Zhuo Wu and Kai-Fei Wang},
     title = {PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors},
+    journal = {Journal of Proteome Research},
+    doi = {10.1021/acs.jproteome.3c00293},
+    url = {https://doi.org/10.1021/acs.jproteome.3c00293},
     year = {2023},
-    doi = {10.1101/2023.05.13.540645},
-    publisher = {Cold Spring Harbor Laboratory},
-    URL = {https://www.biorxiv.org/content/early/2023/05/14/2023.05.13.540645},
-    eprint = {https://www.biorxiv.org/content/early/2023/05/14/2023.05.13.540645.full.pdf},
-    journal = {bioRxiv}
+    type = {Journal Article}
 }
 </pre>
 
 <h4>APA</h4>
-<span class="citation">Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. bioRxiv, 2023.2005.2013.540645. https://doi.org/10.1101/2023.05.13.540645</span>
+<span class="citation">Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. Journal of Proteome Research. https://doi.org/10.1021/acs.jproteome.3c00293</span>
 </div>
 </main>
 
