@@ -5,15 +5,6 @@ from tkinter import ttk
 import meta
 import util
 
-footnote = """
-Note:
-⧫ For .ms2 files, corresponding .ms1 files should be in the same directory.
-⧫ The `IPV` (isotopic pattern vectors) can be automatically generated and cached to specified path.
-⧫ The `Isolation Width` can be set as `auto` if .raw files are provided or using .ms2 files containing `IsolationWidth` line.
-⧫ Select multiple data files using something like `Ctrl + A`.
-⧫ Free feel to contact me if you have any questions :).
-"""
-
 main = ttk.Frame()
 main.pack(fill="both")
 
@@ -103,5 +94,3 @@ I += 1
 util.add_entry(main, I, "Output Directory:", V["out"], "Select", util.askdir(V["out"]))
 I += 1
 task.init_ctrl(ttk.Frame(main), run).grid(column=0, row=I, columnspan=3)
-I += 1
-ttk.Label(main, text=footnote, justify="left").grid(column=0, row=I, columnspan=3, sticky="EW")

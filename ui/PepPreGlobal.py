@@ -5,13 +5,6 @@ from tkinter import ttk
 import meta
 import util
 
-footnote = """
-Note:
-⧫ The `IPV` (isotopic pattern vectors) can be automatically generated and cached to specified path.
-⧫ Select multiple data files using something like `Ctrl + A`.
-⧫ Free feel to contact me if you have any questions :).
-"""
-
 main = ttk.Frame()
 main.pack(fill="both")
 
@@ -76,5 +69,3 @@ I += 1
 util.add_entry(main, I, "Output Directory:", V["out"], "Select", util.askdir(V["out"]))
 I += 1
 task.init_ctrl(ttk.Frame(main), run).grid(column=0, row=I, columnspan=3)
-I += 1
-ttk.Label(main, text=footnote, justify="left").grid(column=0, row=I, columnspan=3, sticky="EW")

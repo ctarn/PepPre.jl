@@ -6,17 +6,6 @@ from tkinter import ttk
 import meta
 import util
 
-footnote = """
-Note:
-⧫ A web page will be opened in the default browser automatically after clicking `Run Task`.
-  Otherwise, you can open the web page manually by visiting above URL in your browser.
-⧫ Most error messages can be safely ignored if the web page is updated as you clicking.
-⧫ Please click `New Port` and re-run the task if you see the error message `address already in use`.
-⧫ The `Output Directory` is only used to store saved task.
-⧫ Please configure `pFind Directory` if you want to use customized pFind settings.
-  The path should be `C:\\pFindStudio\\pFind3\\bin` by default on Windows.
-"""
-
 main = ttk.Frame()
 main.pack(fill="both")
 
@@ -62,5 +51,3 @@ I += 1
 util.add_entry(main, I, "Output Directory:", V["out"], "Select", util.askdir(V["out"]))
 I += 1
 task.init_ctrl(ttk.Frame(main), run).grid(column=0, row=I, columnspan=3)
-I += 1
-ttk.Label(main, text=footnote, justify="left").grid(column=0, row=I, columnspan=3, sticky="EW")

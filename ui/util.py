@@ -213,6 +213,14 @@ def add_separator(form, row, label=None):
     ttk.Separator(form, orient=tk.HORIZONTAL).grid(column=0, row=row, columnspan=3, sticky="EW")
     if label is not None: ttk.Label(form, text=label).grid(column=0, row=row, columnspan=3)
 
+def add_text(weight, str, readonly=True):
+    text = tk.Text(weight, relief=tk.FLAT)
+    text.pack(fill="both")
+    text.insert("end", str)
+    if readonly:
+        text.configure(state="disabled")
+    return text
+
 def askfile(var, out=None, **kwargs):
     def f():
         path = filedialog.askopenfilename(**kwargs)

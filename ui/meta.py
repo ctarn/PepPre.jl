@@ -11,17 +11,6 @@ url = f"http://{name.lower()}.ctarn.io"
 server = f"http://api.ctarn.io/{name}/{version}"
 copyright = f"{name} {version}\nCopyright © 2023 {author}\n{url}"
 homedir = os.path.join(Path.home(), f".{name}", f"v{'.'.join(version.split('.')[0:2])}")
-citation_bib = """@article{Tarn2023PepPre,
-    author = {Ching Tarn and Yu-Zhuo Wu and Kai-Fei Wang},
-    title = {PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors},
-    journal = {Journal of Proteome Research},
-    doi = {10.1021/acs.jproteome.3c00293},
-    url = {https://doi.org/10.1021/acs.jproteome.3c00293},
-    year = {2023},
-    type = {Journal Article}
-}
-"""
-citation_apa = """Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. Journal of Proteome Research. https://doi.org/10.1021/acs.jproteome.3c00293"""
 
 os.makedirs(homedir, exist_ok=True)
 
@@ -46,3 +35,46 @@ vars_spec = {
     "cfg": {"type": tk.StringVar, "value": ""},
 }
 vars = {k: v["type"](value=v["value"]) for k, v in vars_spec.items()}
+
+help_citation = """Please cite the following work if you use the software in your work. 
+
+BibTeX:
+@article{Tarn2023PepPre,
+    author = {Ching Tarn and Yu-Zhuo Wu and Kai-Fei Wang},
+    title = {PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors},
+    journal = {Journal of Proteome Research},
+    doi = {10.1021/acs.jproteome.3c00293},
+    url = {https://doi.org/10.1021/acs.jproteome.3c00293},
+    year = {2023},
+    type = {Journal Article}
+}
+
+APA 7th:
+Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. Journal of Proteome Research. https://doi.org/10.1021/acs.jproteome.3c00293
+
+⧫ Free feel to contact me if you have any questions :).
+
+Tarn Yeong Ching (i@ctarn.io)
+"""
+
+help_isolate = """Note:
+⧫ For .ms2 files, corresponding .ms1 files should be in the same directory.
+⧫ The `IPV` (isotopic pattern vectors) can be automatically generated and cached to specified path.
+⧫ The `Isolation Width` can be set as `auto` if .raw files are provided or using .ms2 files containing `IsolationWidth` line.
+⧫ Select multiple data files using something like `Ctrl + A`.
+"""
+
+help_global = """Note:
+⧫ The `IPV` (isotopic pattern vectors) can be automatically generated and cached to specified path.
+⧫ Select multiple data files using something like `Ctrl + A`.
+"""
+
+help_view = """Note:
+⧫ A web page will be opened in the default browser automatically after clicking `Run Task`.
+  Otherwise, you can open the web page manually by visiting above URL in your browser.
+⧫ Most error messages can be safely ignored if the web page is updated as you clicking.
+⧫ Please click `New Port` and re-run the task if you see the error message `address already in use`.
+⧫ The `Output Directory` is only used to store saved task.
+⧫ Please configure `pFind Directory` if you want to use customized pFind settings.
+  The path should be `C:\\pFindStudio\\pFind3\\bin` by default on Windows.
+"""
