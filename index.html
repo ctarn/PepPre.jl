@@ -138,29 +138,29 @@ pre.citation::-webkit-scrollbar {
 <h2>Abstract</h2>
 <div class="toc"><img src="fig/PepPre_superman.svg" alt="toc"/></div>
 <p>
-    Accurate and comprehensive peptide precursor ions are crucial to tandem mass spectrometry-based peptide identification.
-    An identification engine can greatly benefit from the search space reduction hinted by credible and detailed precursors.
-    Additionally,
-    both the number of identifications and the spectrum explainability can be increased by considering multiple precursors per spectrum.
+    Accurate and comprehensive peptide precursor ions are crucial to tandem mass-spectrometry-based peptide identification.
+    An identification engine can derive great advantages from the search space reduction enabled by credible and detailed precursors.
+    Furthermore,
+    by considering multiple precursors per spectrum,
+    both the number of identifications and the spectrum explainability can be substantially improved.
     Here,
-    we propose PepPre, which detects precursors by decomposing peaks into multiple isotope clusters using linear programming methods.
-    The detected precursors are scored and ranked, and the high-scoring ones are used for the following peptide identification.
-    PepPre is evaluated both on regular and cross-linked peptides datasets, and compared with 11 methods in this paper.
+    we introduce PepPre,
+    which detects precursors by decomposing peaks into multiple isotope clusters using linear programming methods.
+    The detected precursors are scored and ranked, and the high-scoring ones are used for subsequent peptide identification.
+    PepPre is evaluated both on regular and cross-linked peptide data sets and compared with 11 methods.
     The experimental results show that PepPre achieves
-    203% more PSM
-    and 68% more peptide identifications
-    than instrument software for regular peptides,
-    and 99% more PSM
-    and 27% more peptide pair identifications
-    for cross-linked peptides,
-    which also outperforms all other evaluated methods.
+    a remarkable increase of 203% in PSM
+    and 68% in peptide identifications compared to instrument software for regular peptides
+    and 99% in PSM
+    and 27% in peptide pair identifications for cross-linked peptides,
+    surpassing the performance of all other evaluated methods.
     In addition to the increased identification numbers,
-    further credibility evaluation evidence that the identifications are credible.
+    further credibility evaluations evidence the reliability of the identified results.
     Moreover,
-    by widening the isolation window of data acquisition from 2 Th to 8 Th,
-    the engine is able to identify
-    at least 64% more PSMs with PepPre,
-    demonstrating the potential advantages of large isolation windows.
+    by widening the isolation window of data acquisition from 2 to 8 Th,
+    with PepPre,
+    an engine is able to identify at least 64% more PSMs,
+    thereby demonstrating the potential advantages of wide-window data acquisition.
 </p>
 
 <h2>Usage</h2>
