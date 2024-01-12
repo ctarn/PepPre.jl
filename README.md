@@ -47,21 +47,23 @@ You can also call PepPre or PepPreView from command line directly using the comp
 The packaged software would be located at `./tmp/release/`.
 
 ## Citation
+
 ### BibTeX
+
 ```BibTeX
 @article{Tarn2023PepPre,
     author = {Ching Tarn and Yu-Zhuo Wu and Kai-Fei Wang},
     title = {PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors},
+    journal = {Journal of Proteome Research},
+    doi = {10.1021/acs.jproteome.3c00293},
+    url = {https://doi.org/10.1021/acs.jproteome.3c00293},
     year = {2023},
-    doi = {10.1101/2023.05.13.540645},
-    publisher = {Cold Spring Harbor Laboratory},
-    URL = {https://www.biorxiv.org/content/early/2023/05/14/2023.05.13.540645},
-    eprint = {https://www.biorxiv.org/content/early/2023/05/14/2023.05.13.540645.full.pdf},
-    journal = {bioRxiv}
+    type = {Journal Article}
 }
 ```
 
 ### APA
+
 ```
-Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. bioRxiv, 2023.2005.2013.540645. https://doi.org/10.1101/2023.05.13.540645
+Tarn, C., Wu, Y.-Z., & Wang, K.-F. (2023). PepPre: Promote Peptide Identification Using Accurate and Comprehensive Precursors. Journal of Proteome Research. https://doi.org/10.1021/acs.jproteome.3c00293
 ```
