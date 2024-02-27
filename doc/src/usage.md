@@ -15,7 +15,7 @@ Please unzip the downloaded `.zip` file, and PepPre can be used directly without
 For macOS users, we provide both `.pkg` and `.zip` files.
 
 We would recommend to use the `.pkg` file which can be installed by simply double clicking it.
-The software would be installed at `/Applications/MesMS/PepPre.app` by default.
+The software would be installed at `/Applications/UniMS/PepPre.app` by default.
 
 The `.zip` file contains the `.app` package software and can be used directly without installation.
 If the macOS says:
@@ -49,7 +49,7 @@ positional arguments:
 optional arguments:
   -o, --out output      output directory (default: "./out/")
   --ipv IPV             Isotope Pattern Vector file (default:
-                        "/Users/i/.MesMS/peptide.ipv")
+                        "/Users/i/.UniMS/peptide.ipv")
   --mode mono|max       by mono or max mode (default: "mono")
   -w, --width Th        isolation width (default: "auto")
   -z, --charge min:max  charge states (default: "2:6")
@@ -62,7 +62,7 @@ optional arguments:
   -h, --help            show this help message and exit
 ```
 
-For macOS users, the executable files would be located at `/Applications/MesMS/PepPre.app/Contents/MacOS/content/` by default.
+For macOS users, the executable files would be located at `/Applications/UniMS/PepPre.app/Contents/MacOS/content/` by default.
 
 ## Parameters
 

@@ -4,14 +4,14 @@ using Distributed
 
 import ArgParse
 import CSV
-import MesMS: MesMS, PepIso
 import ProgressMeter: @showprogress
+import UniMS: UniMS, PepIso
 
 prepare(args) = begin
     out = mkpath(args["out"])
-    V = MesMS.build_ipv(args["ipv"])
+    V = UniMS.build_ipv(args["ipv"])
     n_peak = parse(Int, args["peak"])
-    zs = Vector{Int}(MesMS.parse_range(Int, args["charge"]))
+    zs = Vector{Int}(UniMS.parse_range(Int, args["charge"]))
     ε = parse(Float64, args["error"]) * 1.0e-6
     τ = parse(Float64, args["thres"])
     gap = parse(Int, args["gap"])
@@ -21,12 +21,12 @@ prepare(args) = begin
 end
 
 process(path; out, V, n_peak, zs, ε, τ, gap) = begin
-    M = MesMS.read_ms(path; MS2=false).MS1
+    M = UniMS.read_ms(path; MS2=false).MS1
     @info "deisotoping"
     I = @showprogress pmap(M) do m
-        peaks = MesMS.pick_by_inten(m.peaks, n_peak)
-        ions = [MesMS.Ion(p.mz, z) for p in peaks for z in zs]
-        ions = filter(i -> i.mz * i.z < MesMS.ipv_max(V) && PepIso.prefilter(i, peaks, ε, V), ions)
+        peaks = UniMS.pick_by_inten(m.peaks, n_peak)
+        ions = [UniMS.Ion(p.mz, z) for p in peaks for z in zs]
+        ions = filter(i -> i.mz * i.z < UniMS.ipv_max(V) && PepIso.prefilter(i, peaks, ε, V), ions)
         ions = PepIso.deisotope(ions, peaks, τ, ε, V; split=true)
         return [(; ion..., ms=m) for ion in ions]
     end
@@ -37,7 +37,7 @@ process(path; out, V, n_peak, zs, ε, τ, gap) = begin
     @info "analysing"
     P = @showprogress map(ions -> PepIso.build_precursor(ions, ε, V), G)
     P = [(; id=i, f...) for (i, f) in enumerate(P)]
-    MesMS.safe_save(p -> CSV.write(p, P), joinpath(out, splitext(basename(path))[1] * ".precursor.csv"))
+    UniMS.safe_save(p -> CSV.write(p, P), joinpath(out, splitext(basename(path))[1] * ".precursor.csv"))
 end
 
 main() = begin
@@ -54,7 +54,7 @@ main() = begin
         "--ipv"
             help = "Isotope Pattern Vector file"
             metavar = "IPV"
-            default = joinpath(homedir(), ".MesMS/peptide.ipv")
+            default = joinpath(homedir(), ".UniMS/peptide.ipv")
         "--peak", "-p"
             help = "max #peak per scan"
             metavar = "num"
@@ -81,7 +81,7 @@ main() = begin
             default = "4"
     end
     args = ArgParse.parse_args(settings)
-    paths = reduce(vcat, MesMS.match_path.(args["data"], ".mes")) |> unique |> sort
+    paths = reduce(vcat, UniMS.match_path.(args["data"], ".mes")) |> unique |> sort
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
     process.(paths; prepare(args)...)

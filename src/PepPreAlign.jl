@@ -5,9 +5,9 @@ using Statistics
 import ArgParse
 import CSV
 import DataFrames
-import MesMS
 import ProgressMeter: @showprogress
 import RelocatableFolders: @path
+import UniMS
 
 const DIR_DATA = @path joinpath(@__DIR__, "../data")
 
@@ -20,7 +20,7 @@ prepare(args) = begin
     ε_t = parse(Float64, args["error_rt"])
     bin_size = parse(Float64, args["bin"])
     α = parse(Float64, args["factor"])
-    softer = MesMS.exp_softer(parse(Float64, args["scale"]))
+    softer = UniMS.exp_softer(parse(Float64, args["scale"]))
 
     df_ref = df_ref[df_ref.rtime_len .≥ len_rt, :]
     DataFrames.sort!(df_ref, :mz)
@@ -53,7 +53,7 @@ process(path; df_ref, out, len_rt, ε_m, ε_t, bin_size, α, softer) = begin
             a = df[i_f, :]
             a.rtime_aligned = a.rtime + Δs[i_b-1]
             if a.rtime_len < len_rt continue end
-            idx = filter(MesMS.argquery_ε(df_ref.mz, a.mz, ε_m)) do i
+            idx = filter(UniMS.argquery_ε(df_ref.mz, a.mz, ε_m)) do i
                 referable[i] && df_ref[i, :z] == a.z && abs(df_ref[i, :rtime] - a.rtime_aligned) ≤ ε_t
             end
             if isempty(idx) continue end
@@ -66,16 +66,16 @@ process(path; df_ref, out, len_rt, ε_m, ε_t, bin_size, α, softer) = begin
             a.match_id = b.id # may not equal to `i`
             a.delta_rt = δ
             a.delta_rt_aligned = b.rtime - a.rtime_aligned
-            a.delta_mz = MesMS.error_ppm(a.mz, b.mz)
+            a.delta_mz = UniMS.error_ppm(a.mz, b.mz)
             a.delta_abu = b.inten_apex / a.inten_apex
         end
         Δs[i_b] = Δs[i_b-1] + (isempty(δs) ? 0 : α * mean(softer.(δs .- Δs[i_b-1])))
     end
     fname = splitext(basename(path))[1]
-    MesMS.safe_save(p -> CSV.write(p, df), joinpath(out, fname * "_aligned.csv"))
+    UniMS.safe_save(p -> CSV.write(p, df), joinpath(out, fname * "_aligned.csv"))
 
     df_shift = DataFrames.DataFrame(time=Vector((bin_min:bin_max) * bin_size), shift=Δs[begin+1:end-1])
-    MesMS.safe_save(p -> CSV.write(p, df_shift), joinpath(out, fname * "_shift.csv"))
+    UniMS.safe_save(p -> CSV.write(p, df_shift), joinpath(out, fname * "_shift.csv"))
 
     df_matched = df[df.matched, :]
     data = """
@@ -90,8 +90,8 @@ const DELTA_RT_MATCH = [$(join(string.(df_matched.delta_rt), ","))]
         "{{ chartjs }}" => read(joinpath(DIR_DATA, "chartjs-4.2.1.js"), String),
         "{{ data }}" => data,
     )
-    MesMS.safe_save(p -> write(p, html), joinpath(out, fname * ".html"))
-    MesMS.open_url(joinpath(out, fname * ".html"))
+    UniMS.safe_save(p -> write(p, html), joinpath(out, fname * ".html"))
+    UniMS.open_url(joinpath(out, fname * ".html"))
 end
 
 main() = begin
@@ -135,7 +135,7 @@ main() = begin
             default = "64"
     end
     args = ArgParse.parse_args(settings)
-    paths = reduce(vcat, MesMS.match_path.(args["data"], ".csv")) |> unique |> sort
+    paths = reduce(vcat, UniMS.match_path.(args["data"], ".csv")) |> unique |> sort
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
     process.(paths; prepare(args)...)

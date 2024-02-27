@@ -5,10 +5,10 @@ using Sockets
 import ArgParse
 import CSV
 import DataFrames
-import MesMS: MesMS, PepIso
 import MesUtil: pFind
 import ProgressMeter: @showprogress
 import RelocatableFolders: @path
+import UniMS: UniMS, PepIso
 
 using Dash
 using PlotlyBase
@@ -26,14 +26,14 @@ end
 
 run_peppre(peaks, mz, r, zs, ε, V, τ; mode=:mono) = begin
     δs = mode == :mono ? zeros(length(zs)) : map(zs) do z
-        MesMS.ipv_dmz(mz, z, argmax(MesMS.ipv_w(mz, z, V)), V)
+        UniMS.ipv_dmz(mz, z, argmax(UniMS.ipv_w(mz, z, V)), V)
     end
-    ions = [MesMS.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
-    ions = filter(i -> i.mz * i.z < MesMS.ipv_max(V) && PepIso.prefilter(i, peaks, ε, V, mode), ions)
+    ions = [UniMS.Ion(p.mz - δ, z) for p in peaks for (z, δ) in zip(zs, δs)]
+    ions = filter(i -> i.mz * i.z < UniMS.ipv_max(V) && PepIso.prefilter(i, peaks, ε, V, mode), ions)
     ions = PepIso.deisotope(ions, peaks, τ, ε, V)
-    inten = sum(p -> p.inten, MesMS.query(peaks, mz - r, mz + r), init=1.0e-16)
+    inten = sum(p -> p.inten, UniMS.query(peaks, mz - r, mz + r), init=1.0e-16)
     ions = map(ions) do ion
-        ratio = sum(MesMS.ipv_w(ion, V)[MesMS.argquery_δ(MesMS.ipv_mz(ion, V), mz, r)], init=0.0)
+        ratio = sum(UniMS.ipv_w(ion, V)[UniMS.argquery_δ(UniMS.ipv_mz(ion, V), mz, r)], init=0.0)
         return (; ion.mz, ion.z, score=(ion.m * ion.x * ratio / inten), score_m=ion.m, score_x=ion.x, ratio, inten)
     end
     return sort(filter(i -> i.score > 0, ions); rev=true, by=i -> i.score)
@@ -45,19 +45,19 @@ plot_peppre(ps, mz, mz_w, ions, df_psm, ε, V) = begin
             mode="lines", line_color="black", name="", showlegend=false,
         )
     end
-    max_inten = MesMS.max_inten(ps, 0, Inf)
+    max_inten = UniMS.max_inten(ps, 0, Inf)
     push!(ls, scatter(;
         iw_trace(mz, mz_w, max_inten)...,
         mode="lines", line_dash="dash", line_color="red", name="isolation window",
     ))
     for r in eachrow(df_psm)
         push!(ls, scatter(;
-            x=[r.mz], y=[MesMS.max_inten_ε(ps, r.mz, ε)], mode="markers+text", name="PSM#$(r.id)",
+            x=[r.mz], y=[UniMS.max_inten_ε(ps, r.mz, ε)], mode="markers+text", name="PSM#$(r.id)",
             text=["#$(r.id)"], hovertext=["$(pFind.pepstr(r.pep, r.mod))"], textposition="top",
         ))
     end
     for (idx, i) in enumerate(ions)
-        xs, ys = MesMS.ipv_mz(i, V), -MesMS.ipv_w(i, V) .* i.score_x
+        xs, ys = UniMS.ipv_mz(i, V), -UniMS.ipv_w(i, V) .* i.score_x
         xs_, ys_ = [], []
         for (x, y) in zip(xs, ys)
             append!(xs_, [x, x, nothing])
@@ -182,7 +182,7 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         ms1 = df_ms1[di_ms1[(ms2.file, ms2.pre)], :]
         ε = ε * 1.0e-6
         zs = range(zs[1], zs[2])
-        ps = MesMS.query(ms1.ms.peaks, ms2.mz - ms2.mz_w / 2 * 2 - 2, ms2.mz + ms2.mz_w / 2 * 2)
+        ps = UniMS.query(ms1.ms.peaks, ms2.mz - ms2.mz_w / 2 * 2 - 2, ms2.mz + ms2.mz_w / 2 * 2)
         ions = run_peppre(ps, ms2.mz, ms2.mz_w / 2, zs, ε, V, τ)
         filter!(i -> i.score ≥ s, ions)
         fig = plot_peppre(ps, ms2.mz, ms2.mz_w, ions, df_psm[ms2.psm, :], ε, V)
@@ -203,9 +203,9 @@ build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind
         r = df_psm[parse(Int, v1[v2[begin] + 1].id), :]
         ε = ε * 1.0e-6
         ms2 = df_ms2[di_ms2[(r.file, r.scan)], :]
-        ions = MesMS.build_ions(ms2.ms.peaks, r.pep, r.mod, ε, ele_pfind, aa_pfind, mod_pfind)
-        fig_seq = MesMS.Plotly.seq(r.pep, r.mod, ions)
-        fig_psm = MesMS.Plotly.spec(ms2.ms.peaks, filter(i -> i.peak > 0, ions))
+        ions = UniMS.build_ions(ms2.ms.peaks, r.pep, r.mod, ε, ele_pfind, aa_pfind, mod_pfind)
+        fig_seq = UniMS.Plotly.seq(r.pep, r.mod, ions)
+        fig_psm = UniMS.Plotly.spec(ms2.ms.peaks, filter(i -> i.peak > 0, ions))
         cfg_seq = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_seq_$(r.file)_$(r.scan)_$(r.id)").fields)
         cfg_psm = PlotConfig(toImageButtonOptions=attr(format="svg", filename="PepPre_psm_$(r.file)_$(r.scan)_$(r.id)").fields)
         return fig_seq, cfg_seq, fig_psm, cfg_psm
@@ -215,16 +215,16 @@ end
 
 prepare(args) = begin
     path_psm = args["psm"]
-    V = MesMS.build_ipv(args["ipv"])
+    V = UniMS.build_ipv(args["ipv"])
     path_cfg = args["cfg"]
     if isempty(path_cfg)
         ele_pfind = pFind.read_element() |> NamedTuple
-        aa_pfind = map(x -> MesMS.mass(x, ele_pfind), pFind.read_amino_acid() |> NamedTuple)
-        mod_pfind = MesMS.mapvalue(x -> x.mass, pFind.read_modification())
+        aa_pfind = map(x -> UniMS.mass(x, ele_pfind), pFind.read_amino_acid() |> NamedTuple)
+        mod_pfind = UniMS.mapvalue(x -> x.mass, pFind.read_modification())
     else
         ele_pfind = pFind.read_element(joinpath(path_cfg, "element.ini")) |> NamedTuple
-        aa_pfind = map(x -> MesMS.mass(x, ele_pfind), pFind.read_amino_acid(joinpath(path_cfg, "aa.ini")) |> NamedTuple)
-        mod_pfind = MesMS.mapvalue(x -> x.mass, pFind.read_modification(joinpath(path_cfg, "modification.ini")))
+        aa_pfind = map(x -> UniMS.mass(x, ele_pfind), pFind.read_amino_acid(joinpath(path_cfg, "aa.ini")) |> NamedTuple)
+        mod_pfind = UniMS.mapvalue(x -> x.mass, pFind.read_modification(joinpath(path_cfg, "modification.ini")))
     end
     host = parse(IPAddr, args["host"])
     port = parse(Int, args["port"])
@@ -232,7 +232,7 @@ prepare(args) = begin
 end
 
 process(paths; path_psm, V, ele_pfind, aa_pfind, mod_pfind, host, port) = begin
-    Ms = MesMS.read_ms.(paths)
+    Ms = UniMS.read_ms.(paths)
     names = paths .|> basename .|> splitext .|> first
     df_ms1 = map(names, Ms) do file, M
         map(m -> (; file, m.id, rt=m.retention_time, ms=m), M.MS1)
@@ -268,7 +268,7 @@ process(paths; path_psm, V, ele_pfind, aa_pfind, mod_pfind, host, port) = begin
     df_ms2.n_psm = length.(df_ms2.psm)
     @async begin
         sleep(4)
-        MesMS.open_url("http://$(host):$(port)")
+        UniMS.open_url("http://$(host):$(port)")
     end
     app = build_app(df_ms1, df_ms2, di_ms1, di_ms2, df_psm, ele_pfind, aa_pfind, mod_pfind, V)
     run_server(app, host, port)
@@ -287,7 +287,7 @@ main() = begin
         "--ipv"
             help = "IPV file"
             metavar = "IPV"
-            default = joinpath(homedir(), ".MesMS/peptide.ipv")
+            default = joinpath(homedir(), ".UniMS/peptide.ipv")
         "--cfg"
             help = "pFind config directory"
             default = ""
@@ -301,7 +301,7 @@ main() = begin
             default = "30030"
     end
     args = ArgParse.parse_args(settings)
-    paths = reduce(vcat, MesMS.match_path.(args["data"], ".mes")) |> unique |> sort
+    paths = reduce(vcat, UniMS.match_path.(args["data"], ".mes")) |> unique |> sort
     @info "file paths of selected data:"
     foreach(x -> println("$(x[1]):\t$(x[2])"), enumerate(paths))
     process(paths; prepare(args)...)
