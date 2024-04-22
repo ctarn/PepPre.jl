@@ -24,8 +24,8 @@ task = util.Task("PepPreGlobal", vars_spec, path=meta.homedir, shared_vars_spec=
 V = task.vars
 
 def run_thermorawread(data, out):
-    task.call(*([] if util.is_windows else [V["monoruntime"].get()]), V["thermorawread"].get(), "mes", data, out)
-    return os.path.join(out, os.path.splitext(os.path.basename(data))[0] + ".mes")
+    task.call(*([] if util.is_windows else [V["monoruntime"].get()]), V["thermorawread"].get(), "umz", data, out)
+    return os.path.join(out, os.path.splitext(os.path.basename(data))[0] + ".umz")
 
 def run():
     paths = []
@@ -45,7 +45,7 @@ def run():
 
 util.init_form(main)
 I = 0
-t = (("MES", "*.mes"), ("MS1", "*.ms1"), ("RAW", "*.raw"), ("All", "*.*"))
+t = (("UMZ", "*.umz"), ("MS1", "*.ms1"), ("RAW", "*.raw"), ("All", "*.*"))
 util.add_entry(main, I, "MS Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
 I += 1
 t = (("IPV", "*.ipv"), ("All", "*.*"))

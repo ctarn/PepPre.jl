@@ -37,7 +37,7 @@ new_port()
 
 util.init_form(main)
 I = 0
-t = (("MES", "*.mes"), ("MS2", "*.ms2"), ("All", "*.*"))
+t = (("UMZ", "*.umz"), ("MS2", "*.ms2"), ("All", "*.*"))
 util.add_entry(main, I, "MS Data:", V["data"], "Select", util.askfiles(V["data"], V["out"], filetypes=t))
 I += 1
 t = (("pFind Spectra File", "*.spectra"), ("All", "*.*"))
