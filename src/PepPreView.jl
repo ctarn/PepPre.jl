@@ -8,7 +8,7 @@ import DataFrames
 import ProgressMeter: @showprogress
 import RelocatableFolders: @path
 import UniMZ: UniMZ, PepIso
-import UniMZUtil: pFind
+import UniMZUtil: Proteomics, pFind
 
 using Dash
 using PlotlyBase
@@ -53,7 +53,7 @@ plot_peppre(ps, mz, mz_w, ions, df_psm, ε, V) = begin
     for r in eachrow(df_psm)
         push!(ls, scatter(;
             x=[r.mz], y=[UniMZ.max_inten_ε(ps, r.mz, ε)], mode="markers+text", name="PSM#$(r.id)",
-            text=["#$(r.id)"], hovertext=["$(pFind.pepstr(r.pep, r.mod))"], textposition="top",
+            text=["#$(r.id)"], hovertext=["$(Proteomics.pepstr(r.pep, r.mod))"], textposition="top",
         ))
     end
     for (idx, i) in enumerate(ions)
