@@ -7,4 +7,4 @@ pyinstaller ui/$name.py -Dwy -i fig/$name.png --distpath $out --workpath tmp/bui
 mkdir $out/$name.app/Contents/MacOS/content
 cp -R $content/ $shared/ $out/$name.app/Contents/MacOS/content/
 rm -rf $name.spec $out/$name
-productbuild --sign "Tarn Yeong Ching" --component $out/$name.app /Applications $out.pkg
+productbuild --component $out/$name.app /Applications $out.pkg
