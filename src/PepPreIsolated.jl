@@ -51,12 +51,24 @@ report_ions(Î, I, ε) = begin
     @printf("kept: %d / %d = %.2f%%\n", kept, length(I), kept / length(I) * 100)
 end
 
-slice_ms1(M1, M2, r=NaN) = begin
-    i = 1
+pad_ms1(M1) = vcat([UniMZ.MS1(id=typemin(Int)) for i in 1:8], M1, [UniMZ.MS1(id=typemax(Int)) for i in 1:8])
+
+slice_ms1(M1, i, mz, r) = map(m -> UniMZ.query(m.peaks, mz - r - 2, mz + r + 4), M1[i-8:i+7])
+
+match_ms1(M1, M2, r=NaN; faims=true) = begin
+    cvs = unique(map(m -> m.faims_cv, M2)) |> sort
+    if faims
+        @info "FAIMS CV: $(cvs)"
+    elseif length(cvs) > 1
+        @warn "FAIMS support disabled but multiple FAIMS CV values detected: $(cvs)"
+    end
+    D = [cv => (faims ? i : 1) for (i, cv) in enumerate(cvs)] |> Dict
+    M1s = faims ? map(cv -> pad_ms1(filter(m -> m.faims_cv == cv, M1)), cvs) : [pad_ms1(M1)]
+    I = faims ? ones(Int, length(cvs)) : [1]
     M1 = map(M2) do m2
-        r_ = isnan(r) ? m2.isolation_width / 2 : r
-        while M1[i].id <= m2.id i += 1 end
-        return map(m -> UniMZ.query(m.peaks, m2.activation_center - r_ - 2, m2.activation_center + r_ + 4), M1[i-8:i+7])
+        i = D[m2.faims_cv]
+        while M1s[i][I[i]].id <= m2.id I[i] += 1 end
+        return slice_ms1(M1s[i], I[i], m2.activation_center, isnan(r) ? m2.isolation_width / 2 : r)
     end
     return M1
 end
@@ -116,16 +128,16 @@ prepare(args) = begin
     fmts = split(args["fmt"], ",") .|> strip .|> Symbol
     subdir = ':' ∈ args["fold"]
     batchsize = parse(Int, args["split"])
-    return (; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize)
+    (args["faims"] ∉ ["auto", "on", "off", "true", "false", "1", "0"]) && error("unknown option: faims=$(args["faims"])")
+    faims = args["faims"] ∈ ["auto", "on", "true", "1"]
+    return (; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize, faims)
 end
 
-process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize) = begin
+process(path; out, V, mode, r, zs, ε, τ, folds, inst, fmts, subdir, batchsize, faims) = begin
     M = UniMZ.read_ms(path)
     M1, M2 = M.MS1, M.MS2
-    prepend!(M1, [UniMZ.MS1(id=typemin(Int)) for i in 1:8])
-    append!(M1, [UniMZ.MS1(id=typemax(Int)) for i in 1:8])
-    @info "MS1 slicing"
-    M1 = slice_ms1(M1, M2, r)
+    @info "matching"
+    M1 = match_ms1(M1, M2, r; faims)
 
     @info "evaluating"
     I = @showprogress map(M1, M2) do ms1, ms2
@@ -215,6 +227,10 @@ main() = begin
             help = "output format"
             metavar = "csv,tsv,ms2,mgf,pf2"
             default = "csv"
+        "--faims"
+            help = "FAIMS support"
+            metavar = "auto|on|off|true|false|1|0"
+            default = "auto"
     end
     args = ArgParse.parse_args(settings)
     paths = reduce(vcat, UniMZ.match_path.(args["data"], ".umz")) |> unique |> sort
